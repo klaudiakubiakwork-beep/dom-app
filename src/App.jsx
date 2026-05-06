@@ -204,18 +204,52 @@ function Wydatki({ data, reload }) {
   const [nazwa, setNazwa] = useState(""); const [kwota, setKwota] = useState("");
   const [kat, setKat] = useState("Jedzenie"); const [kto, setKto] = useState("Klaudia");
   const [saving, setSaving] = useState(false); const [ok, setOk] = useState(false);
+  const [editing, setEditing] = useState(null); // {id, nazwa, kwota, kat, kto}
   const total = data.wydatki.reduce((s, i) => s + (i.kwota || 0), 0);
+
   async function dodaj() {
     if (!nazwa || !kwota) return; setSaving(true);
     await db("wydatki", "POST", { id: uid(), nazwa, kwota: parseFloat(kwota), kat, kto, data: tod() });
     setNazwa(""); setKwota(""); setOk(true); setTimeout(() => setOk(false), 1500);
     await reload(); setSaving(false);
   }
+  async function zapisz() {
+    if (!editing.nazwa || !editing.kwota) return; setSaving(true);
+    await db("wydatki", "PATCH", { nazwa: editing.nazwa, kwota: parseFloat(editing.kwota), kat: editing.kat, kto: editing.kto }, `?id=eq.${editing.id}`);
+    setEditing(null); setOk(true); setTimeout(() => setOk(false), 1500);
+    await reload(); setSaving(false);
+  }
+  async function usun(id) {
+    await db("wydatki", "DELETE", null, `?id=eq.${id}`);
+    setEditing(null); await reload();
+  }
+
   return <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
     <Card style={{ background: `linear-gradient(135deg,${MAY.sun},${MAY.matcha})`, border: "none" }}>
       <div style={{ fontSize: 10, color: MAY.forest, opacity: .6, marginBottom: 2 }}>ŁĄCZNIE W TYM MIESIĄCU 💸</div>
       <div style={{ fontSize: 28, fontWeight: 700, color: MAY.forest }}>{Math.round(total)} zł</div>
     </Card>
+
+    {/* MODAL EDYCJI */}
+    {editing && <div style={{ position: "fixed", inset: 0, background: "rgba(26,74,58,0.4)", zIndex: 200, display: "flex", alignItems: "flex-end", justifyContent: "center" }} onClick={e => { if (e.target === e.currentTarget) setEditing(null); }}>
+      <div style={{ background: MAY.bg, borderRadius: "20px 20px 0 0", padding: 20, width: "100%", maxWidth: 480, maxHeight: "85vh", overflowY: "auto" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+          <div style={{ fontSize: 14, fontWeight: 600, color: MAY.forest }}>✏️ Edytuj wydatek</div>
+          <button onClick={() => setEditing(null)} style={{ background: "none", border: "none", fontSize: 18, cursor: "pointer", color: MAY.forest, opacity: .5 }}>✕</button>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 8 }}>
+            <Inp label="Co?" value={editing.nazwa} onChange={v => setEditing(e => ({ ...e, nazwa: v }))} placeholder="np. Biedronka" />
+            <Inp label="Kwota (zł)" value={String(editing.kwota)} onChange={v => setEditing(e => ({ ...e, kwota: v }))} type="number" placeholder="0" />
+          </div>
+          <div><Lbl>Kategoria</Lbl><div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>{["Jedzenie","Dom","Transport","Zdrowie","Ubrania","Rozrywka","Inne"].map(k => <Chip key={k} active={editing.kat === k} onClick={() => setEditing(e => ({ ...e, kat: k }))}>{(KAT_EMO[k] || "")} {k}</Chip>)}</div></div>
+          <div><Lbl>Kto płacił</Lbl><div style={{ display: "flex", gap: 4 }}>{["Klaudia","Maciej","Wspólnie"].map(k => <Chip key={k} active={editing.kto === k} onClick={() => setEditing(e => ({ ...e, kto: k }))}>{k}</Chip>)}</div></div>
+          <Btn onClick={zapisz} disabled={saving} ok={ok}>{ok ? "✓ Zapisano!" : saving ? "Zapisuję…" : "Zapisz zmiany"}</Btn>
+          <button onClick={() => usun(editing.id)} style={{ width: "100%", padding: 10, borderRadius: 10, border: `1.5px solid ${MAY.gum}`, background: "white", color: MAY.gum, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>🗑️ Usuń wydatek</button>
+        </div>
+      </div>
+    </div>}
+
     <Card>
       <SecTitle>➕ Dodaj wydatek</SecTitle>
       <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
@@ -228,10 +262,22 @@ function Wydatki({ data, reload }) {
         <Btn onClick={dodaj} disabled={saving || !nazwa || !kwota} ok={ok}>{ok ? "✓ Dodano!" : saving ? "Zapisuję…" : "Dodaj wydatek"}</Btn>
       </div>
     </Card>
+
     <Card>
-      <SecTitle>🕐 Ostatnie wydatki</SecTitle>
+      <SecTitle>🕐 Ostatnie wydatki <span style={{ fontSize: 10, opacity: .5, fontWeight: 400 }}>· kliknij żeby edytować</span></SecTitle>
       {data.wydatki.length === 0 ? <div style={{ textAlign: "center", color: MAY.forest, opacity: .3, fontSize: 12, padding: 12 }}>Brak wydatków</div> :
-        [...data.wydatki].reverse().slice(0, 12).map(i => <Row key={i.id} title={(KAT_EMO[i.kat] || "") + " " + i.nazwa} sub={`${i.kat} · ${i.kto} · ${i.data}`} right={<span style={{ fontSize: 13, fontWeight: 700, color: MAY.forest }}>{i.kwota} zł</span>} />)}
+        [...data.wydatki].reverse().slice(0, 20).map(i => (
+          <div key={i.id} onClick={() => setEditing({ ...i, kwota: String(i.kwota) })} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "9px 0", borderBottom: `1px solid ${MAY.baby}`, cursor: "pointer" }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 13, fontWeight: 500, color: MAY.forest, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{(KAT_EMO[i.kat] || "")} {i.nazwa}</div>
+              <div style={{ fontSize: 10, color: MAY.forest, opacity: .4, marginTop: 1 }}>{i.kat} · {i.kto} · {i.data}</div>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+              <span style={{ fontSize: 13, fontWeight: 700, color: MAY.forest }}>{i.kwota} zł</span>
+              <span style={{ fontSize: 11, color: MAY.forest, opacity: .3 }}>✏️</span>
+            </div>
+          </div>
+        ))}
     </Card>
   </div>;
 }
