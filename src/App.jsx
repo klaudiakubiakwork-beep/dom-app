@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 const NOTION_PROXY = "https://api.anthropic.com/v1/messages";
 
@@ -679,9 +679,9 @@ function Setup({ onToken }) {
           5. W Notion wejdź na stronę Ekosystem Domu → ⋯ → <strong>Add connections</strong> → wybierz swoją integrację
         </div>
 
-        <Input label="Notion Integration Token" value={t} onChange={setT} placeholder="secret_..." />
+        <Input label="Notion Integration Token" value={t} onChange={setT} placeholder="ntn_ albo secret_..." />
         <div style={{ marginTop: 12 }}>
-          <Btn onClick={() => onToken(t)} disabled={!t.startsWith("secret_")}>
+          <Btn onClick={() => onToken(t)} disabled={!(t.startsWith("secret_") || t.startsWith("ntn_"))}>
             Połącz z Notion
           </Btn>
         </div>
