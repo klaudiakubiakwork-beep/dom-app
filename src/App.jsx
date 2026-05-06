@@ -568,22 +568,343 @@ function Oszczednosci({ data, reload }) {
   </div>;
 }
 
+// ---- NAWYKI ----
+function Nawyki({ data, reload }) {
+  const [nazwa, setNazwa] = useState(""); const [emoji, setEmoji] = useState("⭐"); const [kto, setKto] = useState("Oboje");
+  const [saving, setSaving] = useState(false); const [ok, setOk] = useState(false);
+  const EMOJIS = ["💧","🏋️","🧘","📚","🚶","🥗","😴","🚫","🧹","💊","✍️","🎯","⭐"];
+  const today = tod();
+  const week = Array.from({ length: 7 }, (_, i) => { const d = new Date(); d.setDate(d.getDate() - 6 + i); return d.toISOString().split("T")[0]; });
+
+  async function dodaj() {
+    if (!nazwa) return; setSaving(true);
+    await db("nawyki", "POST", { id: uid(), nazwa, emoji, kto });
+    setNazwa(""); setOk(true); setTimeout(() => setOk(false), 1500);
+    await reload(); setSaving(false);
+  }
+  async function toggle(nawykId, ktoOsoba, data) {
+    const exists = data.nawyki_log?.find(l => l.nawyk_id === nawykId && l.kto === ktoOsoba && l.data === data);
+    if (exists) await db("nawyki_log", "DELETE", null, `?id=eq.${exists.id}`);
+    else await db("nawyki_log", "POST", { id: uid(), nawyk_id: nawykId, kto: ktoOsoba, data });
+    await reload();
+  }
+  async function usunNawyk(id) { await db("nawyki", "DELETE", null, `?id=eq.${id}`); await reload(); }
+
+  const isChecked = (nawykId, ktoOsoba, data) => data.nawyki_log?.some(l => l.nawyk_id === nawykId && l.kto === ktoOsoba && l.data === data);
+  const streak = (nawykId, ktoOsoba) => {
+    let s = 0; const d = new Date();
+    while (true) { const ds = d.toISOString().split("T")[0]; if (!data.nawyki_log?.some(l => l.nawyk_id === nawykId && l.kto === ktoOsoba && l.data === ds)) break; s++; d.setDate(d.getDate() - 1); }
+    return s;
+  };
+
+  return <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+    <Card style={{ background: `linear-gradient(135deg,${MAY.matcha},${MAY.sun})`, border: "none" }}>
+      <div style={{ fontSize: 10, color: MAY.forest, opacity: .6, marginBottom: 4 }}>TRACKER NAWYKÓW 🔥</div>
+      <div style={{ fontSize: 13, color: MAY.forest }}>Zaznaczaj codziennie — budujcie razem dobre nawyki</div>
+    </Card>
+
+    {data.nawyki?.map(n => {
+      const osoby = n.kto === "Oboje" ? ["Klaudia", "Maciej"] : [n.kto];
+      return <Card key={n.id}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={{ fontSize: 20 }}>{n.emoji}</span>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: MAY.forest }}>{n.nazwa}</div>
+              <div style={{ fontSize: 10, color: MAY.forest, opacity: .4 }}>{n.kto}</div>
+            </div>
+          </div>
+          <button onClick={() => usunNawyk(n.id)} style={{ background: "none", border: "none", fontSize: 14, opacity: .25, cursor: "pointer", color: MAY.forest }}>✕</button>
+        </div>
+        {osoby.map(osoba => {
+          const s = streak(n.id, osoba);
+          return <div key={osoba} style={{ marginBottom: 8 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5 }}>
+              <span style={{ fontSize: 11, fontWeight: 600, color: MAY.forest }}>{osoba}</span>
+              {s > 0 && <span style={{ fontSize: 10, background: MAY.gum, color: MAY.forest, padding: "2px 7px", borderRadius: 10, fontWeight: 600 }}>🔥 {s} dni</span>}
+            </div>
+            <div style={{ display: "flex", gap: 4 }}>
+              {week.map(d => {
+                const checked = isChecked(n.id, osoba, d);
+                const isToday = d === today;
+                return <button key={d} onClick={() => toggle(n.id, osoba, d)} style={{ flex: 1, height: 32, borderRadius: 8, border: `1.5px solid ${isToday ? MAY.forest : MAY.sea}`, background: checked ? MAY.forest : "white", cursor: "pointer", fontSize: 10, color: checked ? "white" : MAY.forest, opacity: isToday ? 1 : .7, fontFamily: "inherit" }}>
+                  {checked ? "✓" : DAYS[new Date(d + "T12:00:00").getDay()].slice(0, 1)}
+                </button>;
+              })}
+            </div>
+          </div>;
+        })}
+      </Card>;
+    })}
+
+    <Card>
+      <SecTitle>➕ Dodaj nawyk</SecTitle>
+      <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+        <Inp label="Nazwa nawyku" value={nazwa} onChange={setNazwa} placeholder="np. Pić wodę 2L" />
+        <div><Lbl>Emoji</Lbl><div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>{EMOJIS.map(e => <button key={e} onClick={() => setEmoji(e)} style={{ width: 36, height: 36, borderRadius: 10, border: `1.5px solid ${emoji === e ? MAY.forest : MAY.sea}`, background: emoji === e ? MAY.forest : "white", fontSize: 16, cursor: "pointer" }}>{e}</button>)}</div></div>
+        <div><Lbl>Dla kogo</Lbl><div style={{ display: "flex", gap: 4 }}>{["Klaudia","Maciej","Oboje"].map(k => <Chip key={k} active={kto === k} onClick={() => setKto(k)}>{k}</Chip>)}</div></div>
+        <Btn onClick={dodaj} disabled={saving || !nazwa} ok={ok}>{ok ? "✓ Dodano!" : saving ? "Zapisuję…" : "Dodaj nawyk"}</Btn>
+      </div>
+    </Card>
+  </div>;
+}
+
+// ---- CELE ----
+function Cele({ data, reload }) {
+  const [nazwa, setNazwa] = useState(""); const [kwota, setKwota] = useState(""); const [termin, setTermin] = useState(""); const [emoji, setEmoji] = useState("🎯");
+  const [saving, setSaving] = useState(false); const [ok, setOk] = useState(false);
+  const [wplata, setWplata] = useState({}); // {id: kwota}
+  const EMOJIS = ["🏖️","🚗","🏠","💍","🎓","✈️","🛡️","💻","🎯","👶","🏋️","🎨"];
+  const KOLORY = [MAY.sun, MAY.sea, MAY.matcha, MAY.gum, MAY.blush, MAY.baby];
+
+  async function dodaj() {
+    if (!nazwa || !kwota) return; setSaving(true);
+    await db("cele", "POST", { id: uid(), nazwa, emoji, cel_kwota: parseFloat(kwota), obecna_kwota: 0, kolor: MAY.sun, termin });
+    setNazwa(""); setKwota(""); setTermin(""); setOk(true); setTimeout(() => setOk(false), 1500);
+    await reload(); setSaving(false);
+  }
+  async function wplacNa(cel) {
+    const kwotaW = parseFloat(wplata[cel.id] || 0);
+    if (!kwotaW) return;
+    await db("cele", "PATCH", { obecna_kwota: Math.min((cel.obecna_kwota || 0) + kwotaW, cel.cel_kwota) }, `?id=eq.${cel.id}`);
+    setWplata(p => ({ ...p, [cel.id]: "" }));
+    await reload();
+  }
+  async function usunCel(id) { await db("cele", "DELETE", null, `?id=eq.${id}`); await reload(); }
+
+  return <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+    <Card style={{ background: `linear-gradient(135deg,${MAY.blush},${MAY.sun})`, border: "none" }}>
+      <div style={{ fontSize: 10, color: MAY.forest, opacity: .6, marginBottom: 2 }}>CELE FINANSOWE 🎯</div>
+      <div style={{ fontSize: 22, fontWeight: 700, color: MAY.forest }}>{data.cele?.reduce((s, c) => s + (c.obecna_kwota || 0), 0).toLocaleString("pl-PL")} zł</div>
+      <div style={{ fontSize: 11, color: MAY.forest, opacity: .5 }}>zgromadzono łącznie</div>
+    </Card>
+
+    {data.cele?.map(c => {
+      const pct = c.cel_kwota > 0 ? Math.min((c.obecna_kwota / c.cel_kwota) * 100, 100) : 0;
+      const brakuje = Math.max((c.cel_kwota || 0) - (c.obecna_kwota || 0), 0);
+      const dniDo = c.termin ? Math.ceil((new Date(c.termin) - new Date()) / (1000 * 60 * 60 * 24)) : null;
+      const rataMies = dniDo && dniDo > 0 ? Math.ceil(brakuje / (dniDo / 30)) : null;
+      return <Card key={c.id} style={{ borderLeft: `4px solid ${c.kolor || MAY.sea}` }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={{ fontSize: 22 }}>{c.emoji}</span>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: MAY.forest }}>{c.nazwa}</div>
+              {c.termin && <div style={{ fontSize: 10, color: MAY.forest, opacity: .4 }}>do {new Date(c.termin).toLocaleDateString("pl-PL", { month: "long", year: "numeric" })}</div>}
+            </div>
+          </div>
+          <button onClick={() => usunCel(c.id)} style={{ background: "none", border: "none", fontSize: 14, opacity: .25, cursor: "pointer", color: MAY.forest }}>✕</button>
+        </div>
+        <div style={{ marginBottom: 6 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: MAY.forest, marginBottom: 3 }}>
+            <span style={{ fontWeight: 600 }}>{(c.obecna_kwota || 0).toLocaleString("pl-PL")} zł</span>
+            <span style={{ opacity: .5 }}>cel: {(c.cel_kwota || 0).toLocaleString("pl-PL")} zł</span>
+          </div>
+          <div style={{ height: 8, background: MAY.baby, borderRadius: 4, overflow: "hidden" }}>
+            <div style={{ height: "100%", width: pct + "%", background: pct === 100 ? MAY.matcha : c.kolor || MAY.sea, borderRadius: 4, transition: ".4s" }} />
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between", marginTop: 4 }}>
+            <span style={{ fontSize: 10, color: MAY.forest, opacity: .5 }}>{Math.round(pct)}% ukończone</span>
+            {rataMies && <span style={{ fontSize: 10, color: MAY.forest, opacity: .5 }}>~{rataMies.toLocaleString("pl-PL")} zł/mies.</span>}
+          </div>
+        </div>
+        {pct < 100 && <div style={{ display: "flex", gap: 6, marginTop: 8 }}>
+          <input type="number" placeholder="Wpłać kwotę…" value={wplata[c.id] || ""} onChange={e => setWplata(p => ({ ...p, [c.id]: e.target.value }))} style={{ flex: 1, padding: "8px 10px", borderRadius: 8, border: `1.5px solid ${MAY.sea}`, background: MAY.baby, color: MAY.forest, fontSize: 13, outline: "none", fontFamily: "inherit" }} />
+          <button onClick={() => wplacNa(c)} style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: MAY.forest, color: "white", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>Wpłać</button>
+        </div>}
+        {pct === 100 && <div style={{ textAlign: "center", padding: "6px 0", fontSize: 13, color: MAY.forest, fontWeight: 600 }}>🎉 Cel osiągnięty!</div>}
+      </Card>;
+    })}
+
+    <Card>
+      <SecTitle>➕ Nowy cel</SecTitle>
+      <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+        <Inp label="Nazwa celu" value={nazwa} onChange={setNazwa} placeholder="np. Wakacje we Włoszech" />
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+          <Inp label="Kwota celu (zł)" value={kwota} onChange={setKwota} type="number" placeholder="10000" />
+          <Inp label="Termin (opcja)" value={termin} onChange={setTermin} type="date" />
+        </div>
+        <div><Lbl>Emoji</Lbl><div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>{EMOJIS.map(e => <button key={e} onClick={() => setEmoji(e)} style={{ width: 36, height: 36, borderRadius: 10, border: `1.5px solid ${emoji === e ? MAY.forest : MAY.sea}`, background: emoji === e ? MAY.forest : "white", fontSize: 16, cursor: "pointer" }}>{e}</button>)}</div></div>
+        <Btn onClick={dodaj} disabled={saving || !nazwa || !kwota} ok={ok}>{ok ? "✓ Dodano!" : saving ? "Zapisuję…" : "Dodaj cel"}</Btn>
+      </div>
+    </Card>
+  </div>;
+}
+
+// ---- REMONT ----
+function Remont({ data, reload }) {
+  const [nazwa, setNazwa] = useState(""); const [opis, setOpis] = useState(""); const [budzet, setBudzet] = useState("");
+  const [saving, setSaving] = useState(false); const [ok, setOk] = useState(false);
+  const [wydanieMap, setWydanieMap] = useState({});
+  const STATUSY = ["Planowany", "W toku", "Ukończony"];
+  const SCOL = { "Planowany": MAY.sea, "W toku": MAY.matcha, "Ukończony": MAY.gum };
+  const totalBudzet = data.remont_etapy?.reduce((s, e) => s + (e.budzet || 0), 0) || 0;
+  const totalWydano = data.remont_etapy?.reduce((s, e) => s + (e.wydano || 0), 0) || 0;
+
+  async function dodaj() {
+    if (!nazwa) return; setSaving(true);
+    const kolejnosc = (data.remont_etapy?.length || 0) + 1;
+    await db("remont_etapy", "POST", { id: uid(), nazwa, opis, budzet: parseFloat(budzet) || 0, wydano: 0, status: "Planowany", kolejnosc });
+    setNazwa(""); setOpis(""); setBudzet(""); setOk(true); setTimeout(() => setOk(false), 1500);
+    await reload(); setSaving(false);
+  }
+  async function setStatus(id, status) { await db("remont_etapy", "PATCH", { status }, `?id=eq.${id}`); await reload(); }
+  async function dodajWydatek(etap) {
+    const w = parseFloat(wydanieMap[etap.id] || 0);
+    if (!w) return;
+    await db("remont_etapy", "PATCH", { wydano: (etap.wydano || 0) + w }, `?id=eq.${etap.id}`);
+    setWydanieMap(p => ({ ...p, [etap.id]: "" }));
+    await reload();
+  }
+  async function usun(id) { await db("remont_etapy", "DELETE", null, `?id=eq.${id}`); await reload(); }
+
+  return <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+      <div style={{ borderRadius: 14, padding: "12px 13px", background: MAY.sun }}>
+        <div style={{ fontSize: 16, marginBottom: 4 }}>🏗️</div>
+        <div style={{ fontSize: 17, fontWeight: 700, color: MAY.forest }}>{totalBudzet.toLocaleString("pl-PL")} zł</div>
+        <div style={{ fontSize: 10, color: MAY.forest, opacity: .5, marginTop: 3 }}>całkowity budżet</div>
+      </div>
+      <div style={{ borderRadius: 14, padding: "12px 13px", background: totalWydano > totalBudzet ? MAY.gum : MAY.matcha }}>
+        <div style={{ fontSize: 16, marginBottom: 4 }}>💸</div>
+        <div style={{ fontSize: 17, fontWeight: 700, color: MAY.forest }}>{totalWydano.toLocaleString("pl-PL")} zł</div>
+        <div style={{ fontSize: 10, color: MAY.forest, opacity: .5, marginTop: 3 }}>wydano łącznie</div>
+      </div>
+    </div>
+
+    {totalBudzet > 0 && <Card>
+      <ProgBar value={totalWydano} max={totalBudzet} color={totalWydano > totalBudzet ? MAY.gum : MAY.sea} label="Postęp całkowity" sublabel={`${Math.round((totalWydano / totalBudzet) * 100)}%`} />
+      <div style={{ fontSize: 11, color: MAY.forest, opacity: .5, textAlign: "right" }}>Pozostało: {(totalBudzet - totalWydano).toLocaleString("pl-PL")} zł</div>
+    </Card>}
+
+    {[...( data.remont_etapy || [])].sort((a, b) => a.kolejnosc - b.kolejnosc).map(e => {
+      const pct = e.budzet > 0 ? Math.min((e.wydano / e.budzet) * 100, 100) : 0;
+      return <Card key={e.id} style={{ borderLeft: `4px solid ${SCOL[e.status] || MAY.sea}` }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: MAY.forest }}>{e.nazwa}</div>
+            {e.opis && <div style={{ fontSize: 11, color: MAY.forest, opacity: .45, marginTop: 2 }}>{e.opis}</div>}
+          </div>
+          <button onClick={() => usun(e.id)} style={{ background: "none", border: "none", fontSize: 14, opacity: .25, cursor: "pointer", color: MAY.forest }}>✕</button>
+        </div>
+        {e.budzet > 0 && <div style={{ marginBottom: 8 }}>
+          <ProgBar value={e.wydano || 0} max={e.budzet} color={pct > 100 ? MAY.gum : MAY.sea} label={`Wydano ${(e.wydano || 0).toLocaleString("pl-PL")} zł`} sublabel={`z ${e.budzet.toLocaleString("pl-PL")} zł`} />
+        </div>}
+        <div style={{ display: "flex", gap: 4, marginBottom: 8 }}>
+          {STATUSY.map(s => <button key={s} onClick={() => setStatus(e.id, s)} style={{ flex: 1, padding: "5px 4px", borderRadius: 8, border: `1.5px solid ${e.status === s ? SCOL[s] : MAY.sea}`, background: e.status === s ? SCOL[s] : "white", color: MAY.forest, fontSize: 10, fontWeight: e.status === s ? 600 : 400, cursor: "pointer", fontFamily: "inherit" }}>{s}</button>)}
+        </div>
+        {e.status === "W toku" && <div style={{ display: "flex", gap: 6 }}>
+          <input type="number" placeholder="Dodaj wydatek…" value={wydanieMap[e.id] || ""} onChange={ev => setWydanieMap(p => ({ ...p, [e.id]: ev.target.value }))} style={{ flex: 1, padding: "7px 10px", borderRadius: 8, border: `1.5px solid ${MAY.sea}`, background: MAY.baby, color: MAY.forest, fontSize: 12, outline: "none", fontFamily: "inherit" }} />
+          <button onClick={() => dodajWydatek(e)} style={{ padding: "7px 12px", borderRadius: 8, border: "none", background: MAY.forest, color: "white", fontSize: 11, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>Dodaj</button>
+        </div>}
+      </Card>;
+    })}
+
+    <Card>
+      <SecTitle>➕ Dodaj etap remontu</SecTitle>
+      <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+        <Inp label="Nazwa etapu" value={nazwa} onChange={setNazwa} placeholder="np. Łazienka" />
+        <Inp label="Opis (opcjonalnie)" value={opis} onChange={setOpis} placeholder="np. Wymiana płytek i instalacji" />
+        <Inp label="Budżet (zł)" value={budzet} onChange={setBudzet} type="number" placeholder="15000" />
+        <Btn onClick={dodaj} disabled={saving || !nazwa} ok={ok}>{ok ? "✓ Dodano!" : saving ? "Zapisuję…" : "Dodaj etap"}</Btn>
+      </div>
+    </Card>
+  </div>;
+}
+
+// ---- KREDYTY ----
+function Kredyty({ data, reload }) {
+  const [nazwa, setNazwa] = useState(""); const [kwota, setKwota] = useState(""); const [rata, setRata] = useState("");
+  const [oprocent, setOprocent] = useState(""); const [liczbaRat, setLiczbaRat] = useState(""); const [dataStart, setDataStart] = useState("");
+  const [saving, setSaving] = useState(false); const [ok, setOk] = useState(false);
+
+  async function dodaj() {
+    if (!nazwa || !kwota || !rata) return; setSaving(true);
+    const lr = parseInt(liczbaRat) || 0;
+    await db("kredyty", "POST", { id: uid(), nazwa, kwota_total: parseFloat(kwota), kwota_pozostala: parseFloat(kwota), rata_miesieczna: parseFloat(rata), oprocentowanie: parseFloat(oprocent) || 0, data_start: dataStart || tod(), liczba_rat: lr, raty_pozostale: lr });
+    setNazwa(""); setKwota(""); setRata(""); setOprocent(""); setLiczbaRat(""); setDataStart("");
+    setOk(true); setTimeout(() => setOk(false), 1500);
+    await reload(); setSaving(false);
+  }
+  async function usun(id) { await db("kredyty", "DELETE", null, `?id=eq.${id}`); await reload(); }
+
+  const totalRaty = data.kredyty?.reduce((s, k) => s + (k.rata_miesieczna || 0), 0) || 0;
+  const totalPozostalo = data.kredyty?.reduce((s, k) => s + (k.kwota_pozostala || 0), 0) || 0;
+
+  return <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+      <div style={{ borderRadius: 14, padding: "12px 13px", background: MAY.gum }}>
+        <div style={{ fontSize: 16, marginBottom: 4 }}>📅</div>
+        <div style={{ fontSize: 17, fontWeight: 700, color: MAY.forest }}>{totalRaty.toLocaleString("pl-PL")} zł</div>
+        <div style={{ fontSize: 10, color: MAY.forest, opacity: .5, marginTop: 3 }}>raty miesięcznie</div>
+      </div>
+      <div style={{ borderRadius: 14, padding: "12px 13px", background: MAY.blush }}>
+        <div style={{ fontSize: 16, marginBottom: 4 }}>💰</div>
+        <div style={{ fontSize: 17, fontWeight: 700, color: MAY.forest }}>{totalPozostalo.toLocaleString("pl-PL")} zł</div>
+        <div style={{ fontSize: 10, color: MAY.forest, opacity: .5, marginTop: 3 }}>łącznie do spłaty</div>
+      </div>
+    </div>
+
+    {data.kredyty?.map(k => {
+      const pct = k.kwota_total > 0 ? Math.min(((k.kwota_total - k.kwota_pozostala) / k.kwota_total) * 100, 100) : 0;
+      const latDo = k.raty_pozostale > 0 ? (k.raty_pozostale / 12).toFixed(1) : 0;
+      const totalDoZaplaty = (k.rata_miesieczna || 0) * (k.raty_pozostale || 0);
+      const odsetki = totalDoZaplaty - (k.kwota_pozostala || 0);
+      return <Card key={k.id} style={{ borderLeft: `4px solid ${MAY.gum}` }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 }}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: MAY.forest }}>{k.nazwa}</div>
+          <button onClick={() => usun(k.id)} style={{ background: "none", border: "none", fontSize: 14, opacity: .25, cursor: "pointer", color: MAY.forest }}>✕</button>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 10 }}>
+          {[["Rata miesięczna", (k.rata_miesieczna || 0).toLocaleString("pl-PL") + " zł"], ["Pozostało rat", k.raty_pozostale + " mies."], ["Do spłaty", (k.kwota_pozostala || 0).toLocaleString("pl-PL") + " zł"], ["Oprocentowanie", (k.oprocentowanie || 0) + "%"]].map(([l, v]) =>
+            <div key={l} style={{ background: MAY.baby, borderRadius: 8, padding: "7px 9px" }}>
+              <div style={{ fontSize: 9, color: MAY.forest, opacity: .5, marginBottom: 2 }}>{l}</div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: MAY.forest }}>{v}</div>
+            </div>
+          )}
+        </div>
+        {k.kwota_total > 0 && <ProgBar value={k.kwota_total - k.kwota_pozostala} max={k.kwota_total} color={MAY.sea} label="Spłacono" sublabel={`${Math.round(pct)}% · jeszcze ${latDo} lat`} />}
+        {odsetki > 0 && <div style={{ fontSize: 10, color: MAY.forest, opacity: .45, marginTop: 4 }}>Szacowane odsetki pozostałe: ~{Math.round(odsetki).toLocaleString("pl-PL")} zł</div>}
+      </Card>;
+    })}
+
+    <Card>
+      <SecTitle>➕ Dodaj kredyt / ratę</SecTitle>
+      <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+        <Inp label="Nazwa" value={nazwa} onChange={setNazwa} placeholder="np. Kredyt hipoteczny" />
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+          <Inp label="Kwota kredytu (zł)" value={kwota} onChange={setKwota} type="number" placeholder="400000" />
+          <Inp label="Rata (zł/mies.)" value={rata} onChange={setRata} type="number" placeholder="3530" />
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+          <Inp label="Oprocentowanie (%)" value={oprocent} onChange={setOprocent} type="number" placeholder="7.5" />
+          <Inp label="Liczba rat" value={liczbaRat} onChange={setLiczbaRat} type="number" placeholder="360" />
+        </div>
+        <Inp label="Data rozpoczęcia" value={dataStart} onChange={setDataStart} type="date" />
+        <Btn onClick={dodaj} disabled={saving || !nazwa || !kwota || !rata} ok={ok}>{ok ? "✓ Dodano!" : saving ? "Zapisuję…" : "Dodaj kredyt"}</Btn>
+      </div>
+    </Card>
+  </div>;
+}
+
 // ---- MAIN ----
 const TABS = [
   { id: "dashboard", ico: "🏠", lbl: "Dom" }, { id: "analiza", ico: "📊", lbl: "Analiza" },
   { id: "wydatki", ico: "💸", lbl: "Wydatki" }, { id: "zakupy", ico: "🛒", lbl: "Zakupy" },
   { id: "posilki", ico: "🍽️", lbl: "Posiłki" }, { id: "zadania", ico: "✅", lbl: "Zadania" },
   { id: "zarobki", ico: "💼", lbl: "Zarobki" }, { id: "oplaty", ico: "📋", lbl: "Opłaty" },
-  { id: "oszczednosci", ico: "🏦", lbl: "Oszcz." },
+  { id: "oszczednosci", ico: "🏦", lbl: "Oszcz." }, { id: "nawyki", ico: "🔥", lbl: "Nawyki" },
+  { id: "cele", ico: "🎯", lbl: "Cele" }, { id: "remont", ico: "🏗️", lbl: "Remont" },
+  { id: "kredyty", ico: "💳", lbl: "Kredyty" },
 ];
 
 export default function App() {
   const [tab, setTab] = useState("dashboard");
-  const [data, setData] = useState({ wydatki: [], zakupy: [], posilki: [], zadania: [], zarobki: [], oplaty: [], oszczednosci: [] });
+  const [data, setData] = useState({ wydatki: [], zakupy: [], posilki: [], zadania: [], zarobki: [], oplaty: [], oszczednosci: [], nawyki: [], nawyki_log: [], cele: [], remont_etapy: [], kredyty: [] });
   const [loading, setLoading] = useState(true);
 
   const reload = useCallback(async () => {
-    const [w, z, p, t, zar, o, os] = await Promise.all([
+    const [w, z, p, t, zar, o, os, n, nl, c, r, k] = await Promise.all([
       db("wydatki", "GET", null, "?order=created_at.desc&limit=50"),
       db("zakupy", "GET", null, "?order=created_at.desc&limit=100"),
       db("posilki", "GET", null, "?order=created_at.asc&limit=100"),
@@ -591,14 +912,27 @@ export default function App() {
       db("zarobki", "GET", null, "?order=created_at.asc&limit=24"),
       db("oplaty", "GET", null, "?order=created_at.asc&limit=100"),
       db("oszczednosci", "GET", null, "?order=created_at.desc&limit=50"),
+      db("nawyki", "GET", null, "?order=created_at.asc&limit=50"),
+      db("nawyki_log", "GET", null, "?order=created_at.desc&limit=500"),
+      db("cele", "GET", null, "?order=created_at.asc&limit=20"),
+      db("remont_etapy", "GET", null, "?order=kolejnosc.asc&limit=20"),
+      db("kredyty", "GET", null, "?order=created_at.asc&limit=20"),
     ]);
-    setData({ wydatki: w || [], zakupy: z || [], posilki: p || [], zadania: t || [], zarobki: zar || [], oplaty: o || [], oszczednosci: os || [] });
+    setData({ wydatki: w||[], zakupy: z||[], posilki: p||[], zadania: t||[], zarobki: zar||[], oplaty: o||[], oszczednosci: os||[], nawyki: n||[], nawyki_log: nl||[], cele: c||[], remont_etapy: r||[], kredyty: k||[] });
     setLoading(false);
   }, []);
 
   useEffect(() => { reload(); }, [reload]);
 
-  const screens = { dashboard: <Dashboard data={data} />, analiza: <Analiza data={data} />, wydatki: <Wydatki data={data} reload={reload} />, zakupy: <Zakupy data={data} reload={reload} />, posilki: <Posilki data={data} reload={reload} />, zadania: <Zadania data={data} reload={reload} />, zarobki: <Zarobki data={data} reload={reload} />, oplaty: <Oplaty data={data} reload={reload} />, oszczednosci: <Oszczednosci data={data} reload={reload} /> };
+  const screens = {
+    dashboard: <Dashboard data={data} />, analiza: <Analiza data={data} />,
+    wydatki: <Wydatki data={data} reload={reload} />, zakupy: <Zakupy data={data} reload={reload} />,
+    posilki: <Posilki data={data} reload={reload} />, zadania: <Zadania data={data} reload={reload} />,
+    zarobki: <Zarobki data={data} reload={reload} />, oplaty: <Oplaty data={data} reload={reload} />,
+    oszczednosci: <Oszczednosci data={data} reload={reload} />, nawyki: <Nawyki data={data} reload={reload} />,
+    cele: <Cele data={data} reload={reload} />, remont: <Remont data={data} reload={reload} />,
+    kredyty: <Kredyty data={data} reload={reload} />,
+  };
 
   if (loading) return <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: MAY.bg }}>
     <div style={{ textAlign: "center" }}>
