@@ -120,13 +120,10 @@ function Dashboard({ data, setTab }) {
   const totalZ = (lastZ.klaudia||0)+(lastZ.maciej||0);
   const bilans = totalZ - totalW - totalO;
   const totalCele = data.cele?.reduce((s,c)=>s+(c.obecna_kwota||0),0)||0;
-  const totalRaty = data.kredyty?.reduce((s,k)=>s+(k.rata_miesieczna||0),0)||0;
-  const doKupienia = data.zakupy.filter(i=>!i.kupione).length;
   const otwarteTasks = data.zadania.filter(i=>i.status!=="Gotowe").length;
   const byKat={};
   data.wydatki.forEach(i=>{ byKat[i.kat]=(byKat[i.kat]||0)+i.kwota; });
   const katData = Object.entries(byKat).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]).map(([k,v])=>({ l:(KAT_EMO[k]||"")+" "+k, v, c:KAT_COL[k]||"#ccc" }));
-  const dzisiejszePosilki = data.posilki.filter(p=>p.data===tod());
   const niezaplOplaty = data.oplaty.filter(i=>!i.paid?.[cm]).slice(0,4);
   const otwZadania = data.zadania.filter(i=>i.status!=="Gotowe").slice(0,3);
   const Section = ({ title, onMore, children }) => <Card style={{ marginBottom:0 }}>
@@ -155,9 +152,7 @@ function Dashboard({ data, setTab }) {
     </Card>
     <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
       {[
-        { emoji:"🛒", val:doKupienia+" szt", lbl:"do kupienia", bg:MAY.baby, tab:"zakupy" },
         { emoji:"✅", val:otwarteTasks+" zad.", lbl:"otwarte zadania", bg:MAY.blush, tab:"zadania" },
-        { emoji:"💳", val:Math.round(totalRaty).toLocaleString("pl-PL")+" zł", lbl:"raty mies.", bg:MAY.gum, tab:"kredyty" },
         { emoji:"🎯", val:Math.round(totalCele).toLocaleString("pl-PL")+" zł", lbl:"zgromadzone w celach", bg:MAY.matcha, tab:"cele" },
       ].map(s=><button key={s.tab} onClick={()=>setTab(s.tab)} style={{ borderRadius:14, padding:"12px 13px", background:s.bg, border:"none", cursor:"pointer", textAlign:"left" }}>
         <div style={{ fontSize:18, marginBottom:4 }}>{s.emoji}</div>
@@ -184,14 +179,6 @@ function Dashboard({ data, setTab }) {
       {otwZadania.length===0?<div style={{ textAlign:"center", color:MAY.forest, opacity:.3, fontSize:12, padding:8 }}>Wszystko gotowe! 🎉</div>:
         otwZadania.map(t=><Row key={t.id} title={t.zadanie} sub={t.kto+" · "+t.status} right={<div style={{ width:7, height:7, borderRadius:"50%", background:t.status==="W toku"?MAY.matcha:MAY.gum }}/>}/>)}
     </Section>
-    <Section title="🍽️ Dziś na stole" onMore={()=>setTab("posilki")}>
-      {dzisiejszePosilki.length===0?<div style={{ textAlign:"center", color:MAY.forest, opacity:.3, fontSize:12, padding:8 }}>Brak zaplanowanych posiłków</div>:
-        dzisiejszePosilki.map(p=><Row key={p.id} title={p.danie} sub={p.typ+" · "+p.kto}/>)}
-    </Section>
-    <Section title="🛒 Lista zakupów" onMore={()=>setTab("zakupy")}>
-      {data.zakupy.filter(i=>!i.kupione).length===0?<div style={{ textAlign:"center", color:MAY.forest, opacity:.3, fontSize:12, padding:8 }}>Lista pusta 🎉</div>:
-        data.zakupy.filter(i=>!i.kupione).slice(0,5).map(i=><Row key={i.id} title={i.produkt} sub={i.kat+(i.ilosc?" · "+i.ilosc:"")} right={<div style={{ width:7, height:7, borderRadius:"50%", background:PIL_COL[i.pil]||MAY.sea }}/>}/>)}
-    </Section>
     {data.cele?.length>0 && <Section title="🎯 Cele finansowe" onMore={()=>setTab("cele")}>
       {data.cele.slice(0,3).map(c=>{
         const pct=c.cel_kwota>0?Math.min(((c.obecna_kwota||0)/c.cel_kwota)*100,100):0;
@@ -200,9 +187,6 @@ function Dashboard({ data, setTab }) {
           <div style={{ height:5, background:MAY.baby, borderRadius:3, overflow:"hidden" }}><div style={{ height:"100%", width:pct+"%", background:c.kolor||MAY.sea, borderRadius:3 }}/></div>
         </div>;
       })}
-    </Section>}
-    {data.kredyty?.length>0 && <Section title="💳 Kredyty i raty" onMore={()=>setTab("kredyty")}>
-      {data.kredyty.map(k=><Row key={k.id} title={k.nazwa} sub={`${k.raty_pozostale} rat · ${k.oprocentowanie}%`} right={<span style={{ fontSize:12, fontWeight:700, color:MAY.forest }}>{k.rata_miesieczna} zł/mies.</span>}/>)}
     </Section>}
   </div>;
 }
@@ -269,35 +253,6 @@ function Wydatki({ data, reload }) {
     <Card style={{ background:`linear-gradient(135deg,${MAY.sun},${MAY.matcha})`, border:"none" }}><div style={{ fontSize:10,color:MAY.forest,opacity:.6,marginBottom:2 }}>ŁĄCZNIE W TYM MIESIĄCU 💸</div><div style={{ fontSize:28,fontWeight:700,color:MAY.forest }}>{Math.round(total).toLocaleString("pl-PL")} zł</div></Card>
     <Card><SecTitle>➕ Dodaj wydatek</SecTitle><div style={{ display:"flex", flexDirection:"column", gap:9 }}><div style={{ display:"grid", gridTemplateColumns:"2fr 1fr", gap:8 }}><Inp label="Co?" value={nazwa} onChange={setNazwa} placeholder="np. Biedronka"/><Inp label="Kwota (zł)" value={kwota} onChange={setKwota} type="number" placeholder="0"/></div><div><Lbl>Kategoria</Lbl><div style={{ display:"flex", flexWrap:"wrap", gap:4 }}>{["Jedzenie","Dom","Transport","Zdrowie","Ubrania","Rozrywka","Inne"].map(k=><Chip key={k} active={kat===k} onClick={()=>setKat(k)}>{(KAT_EMO[k]||"")} {k}</Chip>)}</div></div><div><Lbl>Kto płacił</Lbl><div style={{ display:"flex", gap:4 }}>{["Klaudia","Maciej","Wspólnie"].map(k=><Chip key={k} active={kto===k} onClick={()=>setKto(k)}>{k}</Chip>)}</div></div><Btn onClick={dodaj} disabled={saving||!nazwa||!kwota} ok={ok}>{ok?"✓ Dodano!":saving?"Zapisuję…":"Dodaj wydatek"}</Btn></div></Card>
     <Card><SecTitle>🕐 Ostatnie <span style={{ fontSize:10,opacity:.45,fontWeight:400 }}>· kliknij żeby edytować</span></SecTitle>{data.wydatki.length===0?<div style={{ textAlign:"center",color:MAY.forest,opacity:.3,fontSize:12,padding:12 }}>Brak wydatków</div>:[...data.wydatki].reverse().slice(0,20).map(i=><div key={i.id} onClick={()=>setEditing({...i,kwota:String(i.kwota)})} style={{ display:"flex",justifyContent:"space-between",alignItems:"center",padding:"9px 0",borderBottom:`1px solid ${MAY.baby}`,cursor:"pointer" }}><div style={{ flex:1,minWidth:0 }}><div style={{ fontSize:13,fontWeight:500,color:MAY.forest,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis" }}>{(KAT_EMO[i.kat]||"")} {i.nazwa}</div><div style={{ fontSize:10,color:MAY.forest,opacity:.4,marginTop:1 }}>{i.kat} · {i.kto} · {i.data}</div></div><div style={{ display:"flex",alignItems:"center",gap:6,flexShrink:0 }}><span style={{ fontSize:13,fontWeight:700,color:MAY.forest }}>{i.kwota} zł</span><span style={{ fontSize:11,color:MAY.forest,opacity:.25 }}>✏️</span></div></div>)}</Card>
-  </div>;
-}
-
-function Zakupy({ data, reload }) {
-  const [produkt,setProdukt]=useState(""); const [ilosc,setIlosc]=useState("");
-  const [kat,setKat]=useState("Spożywcze"); const [pil,setPil]=useState("Ten tydzień"); const [kto,setKto]=useState("Oboje");
-  const [saving,setSaving]=useState(false); const [ok,setOk]=useState(false);
-  const pending=data.zakupy.filter(i=>!i.kupione);
-  async function dodaj(){ if(!produkt) return; setSaving(true); await db("zakupy","POST",{id:uid(),produkt,ilosc,kat,pil,kto,kupione:false}); setProdukt("");setIlosc("");setOk(true);setTimeout(()=>setOk(false),1500);await reload();setSaving(false); }
-  async function kupione(id){ await db("zakupy","PATCH",{kupione:true},`?id=eq.${id}`);await reload(); }
-  return <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
-    <Card><SecTitle>🛒 Dodaj do listy</SecTitle><div style={{ display:"flex", flexDirection:"column", gap:9 }}><div style={{ display:"grid", gridTemplateColumns:"2fr 1fr", gap:8 }}><Inp label="Co kupić?" value={produkt} onChange={setProdukt} placeholder="np. mleko"/><Inp label="Ile?" value={ilosc} onChange={setIlosc} placeholder="2 szt"/></div><div><Lbl>Kategoria</Lbl><div style={{ display:"flex", flexWrap:"wrap", gap:4 }}>{["Spożywcze","Dom","Chemia","Kosmetyki","Ubrania","Inne"].map(k=><Chip key={k} active={kat===k} onClick={()=>setKat(k)}>{k}</Chip>)}</div></div><div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}><div><Lbl>Pilność</Lbl><div style={{ display:"flex", flexDirection:"column", gap:3 }}>{["Teraz","Ten tydzień","Kiedyś"].map(p=><Chip key={p} active={pil===p} onClick={()=>setPil(p)} color={PIL_COL[p]}>{p}</Chip>)}</div></div><div><Lbl>Kto</Lbl><div style={{ display:"flex", flexDirection:"column", gap:3 }}>{["Klaudia","Maciej","Oboje","Dom"].map(k=><Chip key={k} active={kto===k} onClick={()=>setKto(k)}>{k}</Chip>)}</div></div></div><Btn onClick={dodaj} disabled={saving||!produkt} ok={ok}>{ok?"✓ Dodano!":saving?"Zapisuję…":"Dodaj do listy"}</Btn></div></Card>
-    {["Teraz","Ten tydzień","Kiedyś"].map(p=>{ const items=pending.filter(i=>i.pil===p); return items.length?<Card key={p}><div style={{ display:"flex",alignItems:"center",gap:7,marginBottom:8 }}><div style={{ width:8,height:8,borderRadius:"50%",background:PIL_COL[p] }}/><Lbl>{p}</Lbl></div>{items.map(i=><Row key={i.id} title={i.produkt} sub={`${i.kat} · ${i.kto}${i.ilosc?" · "+i.ilosc:""}`} right={<button onClick={()=>kupione(i.id)} style={{ width:26,height:26,borderRadius:"50%",border:`2px solid ${MAY.sea}`,background:"white",cursor:"pointer",fontSize:12,color:MAY.forest }}>✓</button>}/>)}</Card>:null; })}
-    {pending.length===0&&<Card><div style={{ textAlign:"center",color:MAY.forest,opacity:.3,fontSize:13,padding:16 }}>Lista pusta 🎉</div></Card>}
-  </div>;
-}
-
-function Posilki({ data, reload }) {
-  const [danie,setDanie]=useState(""); const [typ,setTyp]=useState("Obiad"); const [kto,setKto]=useState("Klaudia");
-  const [selDate,setSelDate]=useState(tod()); const [saving,setSaving]=useState(false); const [ok,setOk]=useState(false);
-  const [aiLoad,setAiLoad]=useState(false); const [sugg,setSugg]=useState([]);
-  async function dodaj(){ if(!danie) return; setSaving(true); await db("posilki","POST",{id:uid(),danie,typ,kto,data:selDate}); setDanie("");setSugg([]);setOk(true);setTimeout(()=>setOk(false),1500);await reload();setSaving(false); }
-  async function del(id){ await db("posilki","DELETE",null,`?id=eq.${id}`);await reload(); }
-  async function proponuj(){ setAiLoad(true); try{ const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:200,messages:[{role:"user",content:"Zaproponuj 5 szybkich pomysłów na obiad. Tylko nazwy po polsku, każde w nowej linii."}]})}); const d=await r.json();setSugg((d.content?.[0]?.text||"").trim().split("\n").filter(Boolean).slice(0,5)); }catch(e){} setAiLoad(false); }
-  const week=Array.from({length:7},(_,i)=>{ const d=new Date();d.setDate(d.getDate()+i);return{ds:d.toISOString().split("T")[0],day:d.getDate(),dn:DAYS[d.getDay()]}; });
-  return <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
-    <Card><div style={{ display:"flex", gap:4, overflowX:"auto", paddingBottom:2 }}>{week.map(w=>{ const meals=data.posilki.filter(p=>p.data===w.ds).length; const sel=selDate===w.ds,isT=w.ds===tod(); return <button key={w.ds} onClick={()=>setSelDate(w.ds)} style={{ flex:"0 0 auto",width:44,borderRadius:12,padding:"7px 3px",textAlign:"center",border:`1.5px solid ${sel?MAY.forest:isT?MAY.forest:"transparent"}`,background:sel?MAY.forest:"white",cursor:"pointer" }}><div style={{ fontSize:9,color:sel?MAY.baby:MAY.forest,opacity:sel?1:.5 }}>{w.dn}</div><div style={{ fontSize:15,fontWeight:700,color:sel?"white":MAY.forest,margin:"3px 0" }}>{w.day}</div><div style={{ fontSize:8,color:sel?MAY.baby:MAY.sea,minHeight:9 }}>{meals?"●".repeat(Math.min(meals,3)):"·"}</div></button>; })}</div></Card>
-    <Card><SecTitle>🍽️ Dodaj posiłek</SecTitle><div style={{ display:"flex", flexDirection:"column", gap:9 }}><Inp label="Danie" value={danie} onChange={setDanie} placeholder="np. spaghetti"/>{sugg.length>0&&<div style={{ display:"flex", flexWrap:"wrap", gap:4 }}>{sugg.map(s=><button key={s} onClick={()=>setDanie(s)} style={{ padding:"4px 9px",borderRadius:16,border:`1px solid ${MAY.sea}`,background:MAY.baby,fontSize:11,color:MAY.forest,cursor:"pointer",fontFamily:"inherit" }}>{s}</button>)}</div>}<button onClick={proponuj} disabled={aiLoad} style={{ padding:"8px 12px",borderRadius:10,border:`1.5px dashed ${MAY.sea}`,background:"transparent",fontSize:12,color:MAY.forest,opacity:.6,cursor:"pointer",textAlign:"left",fontFamily:"inherit" }}>{aiLoad?"🤔 Myślę…":"✨ Zaproponuj pomysły AI"}</button><div><Lbl>Posiłek</Lbl><div style={{ display:"flex", flexWrap:"wrap", gap:4 }}>{["Śniadanie","Obiad","Kolacja","Przekąska"].map(k=><Chip key={k} active={typ===k} onClick={()=>setTyp(k)}>{k}</Chip>)}</div></div><div><Lbl>Kto gotuje</Lbl><div style={{ display:"flex", flexWrap:"wrap", gap:4 }}>{["Klaudia","Maciej","Razem","Zamawiane"].map(k=><Chip key={k} active={kto===k} onClick={()=>setKto(k)}>{k}</Chip>)}</div></div><Btn onClick={dodaj} disabled={saving||!danie} ok={ok}>{ok?"✓ Dodano!":saving?"Zapisuję…":"Dodaj do planu"}</Btn></div></Card>
-    <Card><SecTitle>📅 Plan</SecTitle>{data.posilki.filter(p=>p.data===selDate).length===0?<div style={{ textAlign:"center",color:MAY.forest,opacity:.3,fontSize:12,padding:12 }}>Brak posiłków 🍽️</div>:data.posilki.filter(p=>p.data===selDate).map(p=><Row key={p.id} title={p.danie} sub={`${p.typ} · ${p.kto}`} right={<button onClick={()=>del(p.id)} style={{ background:"none",border:"none",cursor:"pointer",fontSize:14,opacity:.3,color:MAY.forest }}>✕</button>}/>)}</Card>
   </div>;
 }
 
@@ -379,42 +334,243 @@ function Cele({ data, reload }) {
   </div>;
 }
 
-function Remont({ data, reload }) {
-  const [nazwa,setNazwa]=useState(""); const [opis,setOpis]=useState(""); const [budzet,setBudzet]=useState("");
-  const [saving,setSaving]=useState(false); const [ok,setOk]=useState(false);
-  const [wydanieMap,setWydanieMap]=useState({});
-  const STATUSY=["Planowany","W toku","Ukończony"];
-  const SCOL={"Planowany":MAY.sea,"W toku":MAY.matcha,"Ukończony":MAY.gum};
-  const totalBudzet=data.remont_etapy?.reduce((s,e)=>s+(e.budzet||0),0)||0;
-  const totalWydano=data.remont_etapy?.reduce((s,e)=>s+(e.wydano||0),0)||0;
-  async function dodaj(){ if(!nazwa) return; setSaving(true); await db("remont_etapy","POST",{id:uid(),nazwa,opis,budzet:parseFloat(budzet)||0,wydano:0,status:"Planowany",kolejnosc:(data.remont_etapy?.length||0)+1}); setNazwa("");setOpis("");setBudzet("");setOk(true);setTimeout(()=>setOk(false),1500);await reload();setSaving(false); }
-  async function setStatus(id,status){ await db("remont_etapy","PATCH",{status},`?id=eq.${id}`);await reload(); }
-  async function dodajWydatek(etap){ const w=parseFloat(wydanieMap[etap.id]||0); if(!w) return; await db("remont_etapy","PATCH",{wydano:(etap.wydano||0)+w},`?id=eq.${etap.id}`); setWydanieMap(p=>({...p,[etap.id]:""}));await reload(); }
-  async function usun(id){ await db("remont_etapy","DELETE",null,`?id=eq.${id}`);await reload(); }
-  return <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
-    <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}><div style={{ borderRadius:14,padding:"12px 13px",background:MAY.sun }}><div style={{ fontSize:16,marginBottom:4 }}>🏗️</div><div style={{ fontSize:17,fontWeight:700,color:MAY.forest }}>{totalBudzet.toLocaleString("pl-PL")} zł</div><div style={{ fontSize:10,color:MAY.forest,opacity:.5,marginTop:3 }}>całkowity budżet</div></div><div style={{ borderRadius:14,padding:"12px 13px",background:totalWydano>totalBudzet?MAY.gum:MAY.matcha }}><div style={{ fontSize:16,marginBottom:4 }}>💸</div><div style={{ fontSize:17,fontWeight:700,color:MAY.forest }}>{totalWydano.toLocaleString("pl-PL")} zł</div><div style={{ fontSize:10,color:MAY.forest,opacity:.5,marginTop:3 }}>wydano łącznie</div></div></div>
-    {totalBudzet>0&&<Card><ProgBar value={totalWydano} max={totalBudzet} color={totalWydano>totalBudzet?MAY.gum:MAY.sea} label="Postęp całkowity" sublabel={`${Math.round((totalWydano/totalBudzet)*100)}%`}/><div style={{ fontSize:11,color:MAY.forest,opacity:.5,textAlign:"right" }}>Pozostało: {(totalBudzet-totalWydano).toLocaleString("pl-PL")} zł</div></Card>}
-    {[...(data.remont_etapy||[])].sort((a,b)=>a.kolejnosc-b.kolejnosc).map(e=>{ const pct=e.budzet>0?Math.min((e.wydano/e.budzet)*100,100):0; return <Card key={e.id} style={{ borderLeft:`4px solid ${SCOL[e.status]||MAY.sea}` }}><div style={{ display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8 }}><div><div style={{ fontSize:13,fontWeight:600,color:MAY.forest }}>{e.nazwa}</div>{e.opis&&<div style={{ fontSize:11,color:MAY.forest,opacity:.45,marginTop:2 }}>{e.opis}</div>}</div><button onClick={()=>usun(e.id)} style={{ background:"none",border:"none",fontSize:14,opacity:.25,cursor:"pointer",color:MAY.forest }}>✕</button></div>{e.budzet>0&&<div style={{ marginBottom:8 }}><ProgBar value={e.wydano||0} max={e.budzet} color={pct>100?MAY.gum:MAY.sea} label={`Wydano ${(e.wydano||0).toLocaleString("pl-PL")} zł`} sublabel={`z ${e.budzet.toLocaleString("pl-PL")} zł`}/></div>}<div style={{ display:"flex",gap:4,marginBottom:8 }}>{STATUSY.map(s=><button key={s} onClick={()=>setStatus(e.id,s)} style={{ flex:1,padding:"5px 4px",borderRadius:8,border:`1.5px solid ${e.status===s?SCOL[s]:MAY.sea}`,background:e.status===s?SCOL[s]:"white",color:MAY.forest,fontSize:10,fontWeight:e.status===s?600:400,cursor:"pointer",fontFamily:"inherit" }}>{s}</button>)}</div>{e.status==="W toku"&&<div style={{ display:"flex",gap:6 }}><input type="number" placeholder="Dodaj wydatek…" value={wydanieMap[e.id]||""} onChange={ev=>setWydanieMap(p=>({...p,[e.id]:ev.target.value}))} style={{ flex:1,padding:"7px 10px",borderRadius:8,border:`1.5px solid ${MAY.sea}`,background:MAY.baby,color:MAY.forest,fontSize:12,outline:"none",fontFamily:"inherit" }}/><button onClick={()=>dodajWydatek(e)} style={{ padding:"7px 12px",borderRadius:8,border:"none",background:MAY.forest,color:"white",fontSize:11,fontWeight:600,cursor:"pointer",fontFamily:"inherit" }}>Dodaj</button></div>}</Card>; })}
-    <Card><SecTitle>➕ Dodaj etap remontu</SecTitle><div style={{ display:"flex", flexDirection:"column", gap:9 }}><Inp label="Nazwa etapu" value={nazwa} onChange={setNazwa} placeholder="np. Łazienka"/><Inp label="Opis (opcjonalnie)" value={opis} onChange={setOpis} placeholder="np. Wymiana płytek i instalacji"/><Inp label="Budżet (zł)" value={budzet} onChange={setBudzet} type="number" placeholder="15000"/><Btn onClick={dodaj} disabled={saving||!nazwa} ok={ok}>{ok?"✓ Dodano!":saving?"Zapisuję…":"Dodaj etap"}</Btn></div></Card>
-  </div>;
+// BAZA PRZEPISÓW
+// ══════════════════════════════════════════════════════════════════════════
+
+const PRZEPISY = {
+  "Szejk żelazowa moc": {
+    kcal:624, czas:"3 min", porcje:1, tagi:["szejk","szybkie","IO","maluch"],
+    skladniki:["1 banan (120g)","1,5 łyżki masła orzechowego (30g)","5 łyżek otrębów pszennych (20g)","2 łyżki płatków owsianych (20g)","3/4 szklanki mleka migdałowego (200ml)","1 łyżka nasion chia (10g)","3/4 porcji WPI (30g)"],
+    wykonanie:"Wszystkie składniki zblendować na gładką masę. Można przechować w lodówce do 24h.",
+  },
+  "Szejk zdrowe jelita": {
+    kcal:513, czas:"3 min", porcje:1, tagi:["szejk","szybkie","IO","maluch"],
+    skladniki:["2 banany lekko zielone (240g)","2 garście borówek (100g)","1,5 garści malin (100g)","0,5 łyżki siemienia lnianego (5g)","1 szklanka mleka migdałowego (230ml)","3/4 porcji WPI (30g)"],
+    wykonanie:"Wszystkie składniki zblendować. Banan lekko zielony — najlepszy dla jelit (skrobia oporna).",
+  },
+  "Szejk proteinowy": {
+    kcal:523, czas:"3 min", porcje:1, tagi:["szejk","szybkie","IO","maluch"],
+    skladniki:["2,5 garści malin (200g)","5 łyżek płatków owsianych (50g)","1 łyżka siemienia lnianego (10g)","1,5 szklanki mleka migdałowego (300ml)","1,25 porcji WPI (40g)"],
+    wykonanie:"Wszystkie składniki zblendować na gładką masę.",
+  },
+  "Szejk śniadaniowy": {
+    kcal:657, czas:"3 min", porcje:1, tagi:["szejk","szybkie","IO","maluch"],
+    skladniki:["2 banany (240g)","1,5 łyżki masła orzechowo-czekoladowego (30g)","2,5 łyżki płatków owsianych (25g)","1,5 szklanki mleka migdałowego (300ml)","3/4 porcji WPI (30g)"],
+    wykonanie:"Wszystkie składniki zblendować. Masło można zastąpić innym masłem orzechowym.",
+  },
+  "Kleik ryżowy z owocami": {
+    kcal:611, czas:"5 min", porcje:1, tagi:["ciepłe","szybkie","IO","maluch"],
+    skladniki:["12,5 łyżki kleiku ryżowego BoboVita (50g)","1,5 garści malin (100g)","1,5 łyżki masła orzechowego (30g)","1,5 porcji WPI (50g)"],
+    wykonanie:"Kleik zalać wodą i dokładnie wymieszać z odżywką. Dodać owoce i masło orzechowe. To kluczowy posiłek — bardzo sycący.",
+    uwaga:"Maliny możesz wymienić na truskawki, borówki, owoce leśne, jagody lub jeżyny.",
+  },
+  "Tosty z mozzarellą": {
+    kcal:524, czas:"10 min", porcje:1, tagi:["ciepłe","IO","maluch"],
+    skladniki:["4 kromki chleba tostowego pszennego (120g)","4 plastry mozzarelli light (80g)","0,5 pomidora (85g)","1 garść szpinaku (25g)"],
+    wykonanie:"Na chleb tostowy położyć plastry mozzarelli, pomidora i liście szpinaku. Zapiec w tosterze, na patelni lub w piekarniku.",
+  },
+  "Tosty z jajkiem i szynką": {
+    kcal:448, czas:"10 min", porcje:1, tagi:["ciepłe","IO","maluch"],
+    skladniki:["2 kromki chleba żytniego (70g)","1 jajko (50g)","0,5 łyżki oliwy (5ml)","1/6 pomidora (30g)","1 plaster szynki (15g)","2 liście sałaty (10g)"],
+    wykonanie:"Pieczywo zrumienić w tosterze. Na wierzch ułożyć sałatę, szynkę i pomidora. Jajko usmażyć na patelni i przełożyć na kanapkę. Przykryć drugą kromką.",
+  },
+  "Kurczak teriyaki z ryżem": {
+    kcal:637, czas:"30 min", porcje:2, tagi:["kurczak","IO","maluch","bulk"],
+    skladniki:["400g piersi kurczaka","60g ryżu basmati","115g papryki czerwonej","100g cukinii","3g czosnku","5g świeżego imbiru","0,5 łyżki oleju rzepakowego","30g sosu teriyaki","10g miodu","3ml soku z limonki","sezam do posypania"],
+    wykonanie:"1. Kurczaka pokrój w paski.\n2. Wymieszaj czosnek, imbir, sos teriyaki, miód i sok z limonki — zamarynuj kurczaka min. 20 minut.\n3. Ugotuj ryż.\n4. Smaż kurczaka z marynatą, podlej 50ml wody i duś pod przykryciem.\n5. Dodaj paprykę i cukinię w paski, duś 5 minut.\n6. Podawaj z ryżem posypanym sezamem.",
+    uwaga:"Gotujesz porcję x2 — starcza na pon–wt–śr (podgrzewasz wt i śr).",
+  },
+  "Makaron z kurczakiem i brokułem": {
+    kcal:526, czas:"25 min", porcje:2, tagi:["kurczak","makaron","IO","maluch","bulk"],
+    skladniki:["300g piersi kurczaka","100g makaronu razowego pszennego","100g brokułów","50g cebuli","10g parmezanu","bazylia, oregano","sól, pieprz","10g orzechów arachidowych"],
+    wykonanie:"1. Makaron ugotuj w osolonej wodzie. W połowie gotowania dodaj brokuły. Odcedź.\n2. Kurczaka pokrój, dopraw i smaż z cebulą na oliwie.\n3. Dodaj makaron z brokułem, starty parmezan i bazylię.\n4. Dopraw, wymieszaj.\n5. Posyp orzechami.",
+    uwaga:"Gotujesz porcję x2 — starcza na czw–pt–sob.",
+  },
+  "Spaghetti carbonara": {
+    kcal:836, czas:"20 min", porcje:1, tagi:["makaron","jajka","IO"],
+    skladniki:["100g makaronu pełnoziarnistego","2 jajka","50g parmezanu","1 ząbek czosnku","50g jogurtu naturalnego 2%","30g boczku wędzonego","20g pietruszki","sól, pieprz czarny"],
+    wykonanie:"1. Makaron ugotować al dente.\n2. Wbić jajka do miseczki, dodać starty parmezan, połowę pietruszki, sól i pieprz — wymieszać.\n3. Boczek pokroić, smażyć na suchej patelni 2 minuty. Dodać czosnek.\n4. Dorzucić makaron i podgrzewać minutę.\n5. Wlać masę jajeczną — pilnować żeby się nie ścięły.\n6. Zdjąć z ognia, odczekać 2 minuty, dodać jogurt i wymieszać.\n7. Posypać pietruszką.",
+  },
+  "Burgery z kurczakiem i mozzarellą": {
+    kcal:450, czas:"25 min", porcje:1, tagi:["kurczak","IO","maluch"],
+    skladniki:["100g piersi kurczaka","1 bułka żytnia (71g)","2 łyżeczki musztardy","0,5 łyżki oliwy","25g mozzarelli w kulce","garść szpinaku","papryka słodka i ostra, rozmaryn, sól"],
+    wykonanie:"1. Kurczaka pokroić wzdłuż na pół.\n2. Oliwę wymieszać z przyprawami — natrzeć mięso i odstawić 20 min.\n3. Bułki przekroić i zgrillować wewnętrzem do dołu.\n4. Kurczaka grillować z obu stron kilka minut.\n5. Spody posmarować musztardą, ułożyć kurczaka, szpinak i mozzarellę.\n6. Przykryć górną połówką.",
+  },
+  "Pieczony łosoś w porach": {
+    kcal:568, czas:"35 min", porcje:1, tagi:["ryba","łosoś","IO","maluch"],
+    skladniki:["120g łososia świeżego","40g pora","2 szalotki (40g)","2 łyżki jogurtu naturalnego 0%","10ml oliwy","45g ryżu basmati","100g roszponki","świeży koperek","1 łyżka soku z cytryny","oregano, sól, pieprz"],
+    wykonanie:"1. Pora i szalotkę pokrój. Podduś na oliwie ~5 min, dodaj koperek.\n2. W naczyniu żaroodpornym ułóż por, na nim łososia, skrop cytryną. Resztę warzyw dookoła.\n3. Piecz 15 min w 200°C.\n4. Ugotuj ryż.\n5. Roszponkę wymieszaj z jogurtem.\n6. Podawaj razem.",
+  },
+  "Łosoś w panierce z sezamu": {
+    kcal:652, czas:"20 min", porcje:1, tagi:["ryba","łosoś","IO"],
+    skladniki:["150g łososia świeżego","10g sezamu czarnego + 10g białego","70g awokado","45g ogórka","20g rukoli","0,5 łyżki oleju rzepakowego","0,5 łyżki oliwy","3ml soku z limonki","sól, pieprz"],
+    wykonanie:"1. Łososia obtoczyć w sezamie i usmażyć na oleju.\n2. Awokado pokroić w kostkę, ogórek w plasterki.\n3. Oliwę, sok z limonki, sól i pieprz wymieszać — sos.\n4. Warzywa wymieszać z rukolą i polać sosem.\n5. Podawać razem.",
+    uwaga:"Dietetyk napisał: Zrób sobie na 2 dni! 😊",
+  },
+  "Sałatka z ananasem i indykiem": {
+    kcal:522, czas:"15 min", porcje:1, tagi:["indyk","sałatka","IO"],
+    skladniki:["67g piersi indyka","53g ananasa","80ml bulionu warzywnego","57g kaszy kuskus","33g kukurydzy","20g jogurtu naturalnego","17g majonezu","7ml oliwy","4ml soku z cytryny"],
+    wykonanie:"1. Indyka pokroić, doprawić i obsmażyć na oliwie.\n2. Bulion zagotować, zalać kuskus — przykryć 2 minuty.\n3. Kuskus przełożyć do miski.\n4. Ananasa pokroić, dodać z indykiem i kukurydzą.\n5. Majonez + sok z cytryny + jogurt = dressing.\n6. Polać i wymieszać.",
+  },
+  "Tortilla z serkiem i warzywami": {
+    kcal:336, czas:"8 min", porcje:1, tagi:["szybkie","IO","maluch"],
+    skladniki:["1 tortilla pełnoziarnista (60g)","7 łyżeczek ricotty (70g)","1/3 ogórka (60g)","3/4 pomidora (130g)","2 garście roszponki (50g)","2 łyżki szczypiorku","zioła prowansalskie"],
+    wykonanie:"Tortillę zrumienić na suchej patelni. Rozsmarować ricottę, ułożyć warzywa, posypać ziołami. Zrolować i pokroić.",
+  },
+  "Jajecznica w tortilli": {
+    kcal:445, czas:"10 min", porcje:1, tagi:["jajka","szybkie","IO","maluch"],
+    skladniki:["2 jajka (102g)","1 tortilla pełnoziarnista (60g)","45g ogórka","20g rukoli","10g masła","2 plastry suszonych pomidorów (14g)"],
+    wykonanie:"Jajka usmażyć na maśle jako jajecznica. Na tortilli ułożyć jajecznicę, suszone pomidory i warzywa. Zwinąć lub złożyć na pół.",
+    uwaga:"Dla malucha: zamiast suszonych pomidorów daj świeżego pomidora.",
+  },
+  "Jajecznica z boczkiem": {
+    kcal:343, czas:"10 min", porcje:1, tagi:["jajka","szybkie","IO"],
+    skladniki:["3 jajka (150g)","50g boczku wędzonego (5 plastrów)","sól, pieprz czarny"],
+    wykonanie:"Jajka wbić do miseczki, roztrzepać, doprawić. Na rozgrzaną patelnię dodać boczek, podsmażyć. Wlać jajka i usmażyć do preferowanej konsystencji.",
+    uwaga:"Do tej kolacji dodaj +200g ulubionych warzyw.",
+  },
+  "Naleśniki z mascarpone i malinami": {
+    kcal:554, czas:"20 min", porcje:1, tagi:["naleśniki","IO","maluch"],
+    skladniki:["1 jajko (50g)","70g mąki pszennej","50ml mleka 2%","50g mascarpone (2 łyżki)","50g malin"],
+    wykonanie:"1. Wymieszać mąkę, jajko, mleko (i odrobinę oleju).\n2. Usmażyć naleśniki.\n3. Nadziewać mascarpone i malinami.",
+    uwaga:"Maliny możesz zastąpić truskawkami lub borówkami.",
+  },
+  "Fit smoothie z szpinakiem": {
+    kcal:435, czas:"3 min", porcje:1, tagi:["szejk","szybkie","IO","maluch"],
+    skladniki:["1 banan (120g)","1 jabłko (180g)","1 garść szpinaku (25g)","3/4 szklanki mleka migdałowego (200ml)","10ml soku z cytryny","1,5 porcji WPI (50g)"],
+    wykonanie:"Banana obrać i pokroić. Jabłko oczyścić i pokroić. Wszystkie składniki zblendować. Przelać do szklanki.",
+  },
+  "Pieczony dorsz z warzywami i ziemniakami": {
+    kcal:693, czas:"45 min", porcje:1, tagi:["ryba","dorsz","IO","maluch"],
+    skladniki:["200g filetu z dorsza","4,5 ziemniaków późnych (405g)","120g cukinii","100g papryki czerwonej","100g pomidorków koktajlowych","50g czerwonej cebuli","1 ząbek czosnku","10ml oliwy","6ml soku z cytryny","bazylia, oregano, papryka słodka, sól, pieprz","pietruszka do posypania"],
+    wykonanie:"1. Ziemniaki obrać, pokroić i ugotować na półtwardo (~10 min). Odcedzić.\n2. Warzywa pokroić i wymieszać z oliwą, czosnkiem i przyprawami.\n3. W naczyniu żaroodpornym: ziemniaki → warzywa → dorsz skropiony cytryną.\n4. Skropić resztą oliwy. Piec w 190°C ~30 min.\n5. Posypać natką pietruszki.",
+  },
+  "Bowl z kurczakiem i kuskusem": {
+    kcal:692, czas:"25 min", porcje:1, tagi:["kurczak","IO","maluch"],
+    skladniki:["150g piersi kurczaka","60g kaszy kuskus","100g ciecierzycy z puszki","100g pomidorków koktajlowych","100g ogórka","30g czerwonej cebuli","10ml oliwy","15ml soku z cytryny","pietruszka, oregano, papryka","sól, pieprz"],
+    wykonanie:"1. Kurczaka pokroić, doprawić i ugrillować bez tłuszczu.\n2. Kuskus przygotować wg instrukcji.\n3. Warzywa pokroić.\n4. Oliwa + sok z cytryny + przyprawy = sos.\n5. W misce: kuskus + warzywa + ciecierzyca + kurczak + sos + pietruszka.",
+  },
+  "Zapiekanka ze szpinakiem i kurczakiem": {
+    kcal:695, czas:"35 min", porcje:1, tagi:["kurczak","makaron","IO"],
+    skladniki:["150g piersi kurczaka","100g makaronu pełnoziarnistego pióra","75g szpinaku","40g sera feta","56g śmietany 12%","28g suszonych pomidorów w oleju","10ml oliwy","1 ząbek czosnku","papryka chili, słodka, gałka muszkatołowa","sól, pieprz"],
+    wykonanie:"1. Makaron ugotować al dente.\n2. Kurczaka obsmażyć na złoto, odłożyć.\n3. Podsmażyć czosnek i suszone pomidory. Dodać szpinak.\n4. Wlać śmietanę, doprawić.\n5. Dorzucić kurczaka, makaron i pokrojoną fetę.\n6. Zapiekać 20 min w 200°C.",
+  },
+  "Kaszotto gryczane z indykiem": {
+    kcal:693, czas:"30 min", porcje:1, tagi:["indyk","kasza","IO","maluch"],
+    skladniki:["150g mielonego mięsa z indyka","70g kaszy gryczanej","200g mrożonego kalafiora","75g szpinaku","45g marchewki","50g cebuli","35g pora","250ml bulionu","1 ząbek czosnku","10ml oliwy","kurkuma, kolendra, pieprz, sól"],
+    wykonanie:"1. Zeszklić cebulę i por na oliwie.\n2. Dodać czosnek i startą marchewkę, smażyć 2 min.\n3. Dodać mięso — obsmażać ~2 min.\n4. Dodać kaszę i bulion, zagotować.\n5. Doprawić kurkumą i kolendrą.\n6. Dodać kalafior, przykryć — gotować 15 min.\n7. Dodać szpinak, smażyć mieszając ~2 min.",
+  },
+  "Kurczak caprese z piekarnika": {
+    kcal:688, czas:"40 min", porcje:1, tagi:["kurczak","IO","maluch"],
+    skladniki:["200g piersi kurczaka (bez skóry)","125g mozzarelli w kulce","1 pomidor (160g)","15ml oliwy z oliwek","5g świeżego tymianku","5g świeżej bazylii","sól, pieprz"],
+    wykonanie:"1. Piekarnik rozgrzać do 190°C.\n2. Filety naciąć w 5 miejscach na ~2cm głębokości.\n3. Natrzeć tymiankiem i oliwą, doprawić.\n4. W naczyniu ułożyć plastry pomidora (doprawione), na nich filety.\n5. Mozzarellę pokroić — wsunąć w nacięcia z listkami bazylii.\n6. Piec bez przykrycia ~35 min.\n7. Posypać świeżą bazylią.",
+  },
+  "Łosoś z fasolką": {
+    kcal:711, czas:"25 min", porcje:1, tagi:["ryba","łosoś","IO","maluch"],
+    skladniki:["170g łososia świeżego","150g fasolki szparagowej","50g ryżu brązowego","15ml oleju rzepakowego","2g suszonego tymianku","12ml soku z cytryny","sól, pieprz"],
+    wykonanie:"1. Rybę natrzeć tymiankiem i olejem.\n2. Upiec w naczyniu żaroodpornym razem z fasolką w 200°C przez 15-20 min (podlewaj wodą).\n3. Ugotować ryż.\n4. Łososia skropić cytryną. Podawać z ryżem.",
+  },
+  "Klopsiki szpinakowe w sosie pomidorowym": {
+    kcal:714, czas:"35 min", porcje:1, tagi:["indyk","IO","maluch"],
+    skladniki:["150g mielonego mięsa z indyka","75g szpinaku","1 jajko","2 pomidory (360g)","50g ryżu brązowego","15ml oliwy","1 ząbek czosnku","0,5 cebuli","oregano, majeranek, sól, pieprz"],
+    wykonanie:"1. Cebulę i czosnek podsmażyć na połowie oliwy. Dodać pomidory, dusić z ziołami — sos gotowy.\n2. Na drugiej patelni podsmażyć czosnek i szpinak.\n3. Mięso wymieszać z jajkiem, solą, pieprzem i szpinakiem. Uformować pulpety.\n4. Gotować klopsiki w sosie ~15-20 min.\n5. Podawać z ryżem.",
+  },
+  "Indyk w sosie śmietanowym ze szpinakiem": {
+    kcal:714, czas:"25 min", porcje:1, tagi:["indyk","IO","maluch"],
+    skladniki:["150g piersi indyka (bez skóry)","100g szpinaku","50g sera feta","70g śmietanki 18%","50g kaszy jaglanej","15ml oliwy","25g cebuli","1 ząbek czosnku","pietruszka, sól, pieprz"],
+    wykonanie:"1. Indyka pokroić w paseczki.\n2. Zeszklić cebulę i czosnek na oliwie.\n3. Dodać mięso, podsmażyć.\n4. Dodać szpinak — dusić aż zwiędnie.\n5. Dodać fetę i śmietankę, wymieszać.\n6. Podawać z ugotowaną kaszą jaglaną i pietruszką.",
+  },
+  "Kurczak z ryżem w zielonym sosie": {
+    kcal:685, czas:"30 min", porcje:1, tagi:["kurczak","IO","maluch"],
+    skladniki:["150g piersi kurczaka","100g ryżu dzikiego","100ml mleczka kokosowego","0,5 łyżki oleju kokosowego","12g pietruszki","3g kolendry suszonej","10g szczypiorku","1 ząbek czosnku","sól"],
+    wykonanie:"1. Mleczko kokosowe zmiksować z ziołami (pietruszka, kolendra, szczypiorek).\n2. Kurczaka usmażyć, podlać wodą i dusić 10 min. Wyjąć.\n3. Na tej samej patelni podsmażyć czosnek 2-3 min.\n4. Wlać zielone mleczko. Gotować 9-10 min do zgęstnienia.\n5. Ugotować ryż dziki.\n6. Ułożyć kurczaka na ryżu, zalać sosem.",
+  },
+};
+
+// ══════════════════════════════════════════════════════════════════════════
+// MODAL Z PRZEPISEM
+// ══════════════════════════════════════════════════════════════════════════
+
+function PrzepisModal({ nazwa, onClose }) {
+  const p = PRZEPISY[nazwa];
+  if (!p) return null;
+
+  const tagColor = (t) => {
+    if (t==="maluch") return { bg:"#E8F0FB", c:"#2C5282" };
+    if (t==="IO") return { bg:MAY.sun, c:MAY.forest };
+    if (t==="bulk") return { bg:"#EBF2EB", c:"#3B6D3A" };
+    if (t==="szejk"||t==="szybkie") return { bg:MAY.baby, c:MAY.forest };
+    return { bg:MAY.blush, c:MAY.forest };
+  };
+
+  return (
+    <div style={{ position:"fixed", inset:0, background:"rgba(26,74,58,0.55)", zIndex:500, display:"flex", alignItems:"flex-end", justifyContent:"center" }}
+      onClick={e=>{ if(e.target===e.currentTarget) onClose(); }}>
+      <div style={{ background:MAY.bg, borderRadius:"20px 20px 0 0", padding:"20px 18px", width:"100%", maxWidth:480, maxHeight:"88vh", overflowY:"auto" }}>
+
+        {/* Header */}
+        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:14 }}>
+          <div style={{ flex:1, paddingRight:12 }}>
+            <div style={{ fontSize:17, fontWeight:700, color:MAY.forest, lineHeight:1.3 }}>{nazwa}</div>
+            <div style={{ display:"flex", gap:5, flexWrap:"wrap", marginTop:7 }}>
+              {(p.tagi||[]).map(t=>{
+                const c=tagColor(t);
+                return <span key={t} style={{ fontSize:10, padding:"2px 7px", borderRadius:10, background:c.bg, color:c.c }}>{t}</span>;
+              })}
+            </div>
+          </div>
+          <button onClick={onClose} style={{ background:"none", border:"none", fontSize:20, cursor:"pointer", color:MAY.forest, opacity:.35, flexShrink:0 }}>✕</button>
+        </div>
+
+        {/* Stats */}
+        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:7, marginBottom:16 }}>
+          {[["🔥","Kcal",p.kcal],["⏱️","Czas",p.czas],["🍽️","Porcje",p.porcje===2?"2 (bulk)":"1"]].map(([e,l,v])=>(
+            <div key={l} style={{ background:"white", borderRadius:10, padding:"8px 10px", border:`1px solid ${MAY.sea}`, textAlign:"center" }}>
+              <div style={{ fontSize:14, marginBottom:2 }}>{e}</div>
+              <div style={{ fontSize:13, fontWeight:700, color:MAY.forest }}>{v}</div>
+              <div style={{ fontSize:9, color:MAY.forest, opacity:.4 }}>{l}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Składniki */}
+        <div style={{ marginBottom:14 }}>
+          <div style={{ fontSize:12, fontWeight:600, color:MAY.forest, marginBottom:8, textTransform:"uppercase", letterSpacing:.5, opacity:.6 }}>Składniki</div>
+          <div style={{ background:"white", borderRadius:12, border:`1px solid ${MAY.sea}`, overflow:"hidden" }}>
+            {(p.skladniki||[]).map((s,i)=>(
+              <div key={i} style={{ display:"flex", alignItems:"flex-start", gap:10, padding:"8px 13px", borderBottom: i<p.skladniki.length-1?`1px solid ${MAY.baby}`:"none" }}>
+                <div style={{ width:5, height:5, borderRadius:"50%", background:MAY.sea, flexShrink:0, marginTop:6 }}/>
+                <div style={{ fontSize:13, color:MAY.forest, lineHeight:1.4 }}>{s}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Wykonanie */}
+        <div style={{ marginBottom: p.uwaga ? 12 : 0 }}>
+          <div style={{ fontSize:12, fontWeight:600, color:MAY.forest, marginBottom:8, textTransform:"uppercase", letterSpacing:.5, opacity:.6 }}>Przygotowanie</div>
+          <div style={{ background:"white", borderRadius:12, border:`1px solid ${MAY.sea}`, padding:"12px 14px" }}>
+            {(p.wykonanie||"").split("\n").map((line,i)=>(
+              <div key={i} style={{ fontSize:13, color:MAY.forest, lineHeight:1.6, marginBottom: line.startsWith(String(i+1)) ? 4 : 0 }}>{line}</div>
+            ))}
+          </div>
+        </div>
+
+        {/* Uwaga */}
+        {p.uwaga && (
+          <div style={{ background:MAY.sun, borderRadius:10, padding:"10px 13px", marginTop:12, display:"flex", gap:8 }}>
+            <span style={{ fontSize:14 }}>💡</span>
+            <div style={{ fontSize:12, color:MAY.forest, lineHeight:1.5 }}>{p.uwaga}</div>
+          </div>
+        )}
+
+        <div style={{ height:24 }}/>
+      </div>
+    </div>
+  );
 }
 
-function Kredyty({ data, reload }) {
-  const [nazwa,setNazwa]=useState(""); const [kwota,setKwota]=useState(""); const [rata,setRata]=useState("");
-  const [oprocent,setOprocent]=useState(""); const [liczbaRat,setLiczbaRat]=useState(""); const [dataStart,setDataStart]=useState("");
-  const [saving,setSaving]=useState(false); const [ok,setOk]=useState(false);
-  async function dodaj(){ if(!nazwa||!kwota||!rata) return; setSaving(true); const lr=parseInt(liczbaRat)||0; await db("kredyty","POST",{id:uid(),nazwa,kwota_total:parseFloat(kwota),kwota_pozostala:parseFloat(kwota),rata_miesieczna:parseFloat(rata),oprocentowanie:parseFloat(oprocent)||0,data_start:dataStart||tod(),liczba_rat:lr,raty_pozostale:lr}); setNazwa("");setKwota("");setRata("");setOprocent("");setLiczbaRat("");setDataStart(""); setOk(true);setTimeout(()=>setOk(false),1500);await reload();setSaving(false); }
-  async function usun(id){ await db("kredyty","DELETE",null,`?id=eq.${id}`);await reload(); }
-  const totalRaty=data.kredyty?.reduce((s,k)=>s+(k.rata_miesieczna||0),0)||0;
-  const totalPoz=data.kredyty?.reduce((s,k)=>s+(k.kwota_pozostala||0),0)||0;
-  return <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
-    <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}><div style={{ borderRadius:14,padding:"12px 13px",background:MAY.gum }}><div style={{ fontSize:16,marginBottom:4 }}>📅</div><div style={{ fontSize:17,fontWeight:700,color:MAY.forest }}>{totalRaty.toLocaleString("pl-PL")} zł</div><div style={{ fontSize:10,color:MAY.forest,opacity:.5,marginTop:3 }}>raty miesięcznie</div></div><div style={{ borderRadius:14,padding:"12px 13px",background:MAY.blush }}><div style={{ fontSize:16,marginBottom:4 }}>💰</div><div style={{ fontSize:17,fontWeight:700,color:MAY.forest }}>{totalPoz.toLocaleString("pl-PL")} zł</div><div style={{ fontSize:10,color:MAY.forest,opacity:.5,marginTop:3 }}>łącznie do spłaty</div></div></div>
-    {data.kredyty?.map(k=>{ const pct=k.kwota_total>0?Math.min(((k.kwota_total-k.kwota_pozostala)/k.kwota_total)*100,100):0; const latDo=k.raty_pozostale>0?(k.raty_pozostale/12).toFixed(1):0; const odsetki=(k.rata_miesieczna||0)*(k.raty_pozostale||0)-(k.kwota_pozostala||0);
-      return <Card key={k.id} style={{ borderLeft:`4px solid ${MAY.gum}` }}><div style={{ display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:10 }}><div style={{ fontSize:13,fontWeight:600,color:MAY.forest }}>{k.nazwa}</div><button onClick={()=>usun(k.id)} style={{ background:"none",border:"none",fontSize:14,opacity:.25,cursor:"pointer",color:MAY.forest }}>✕</button></div><div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:10 }}>{[["Rata miesięczna",(k.rata_miesieczna||0).toLocaleString("pl-PL")+" zł"],["Pozostało rat",k.raty_pozostale+" mies."],["Do spłaty",(k.kwota_pozostala||0).toLocaleString("pl-PL")+" zł"],["Oprocentowanie",(k.oprocentowanie||0)+"%"]].map(([l,v])=><div key={l} style={{ background:MAY.baby,borderRadius:8,padding:"7px 9px" }}><div style={{ fontSize:9,color:MAY.forest,opacity:.5,marginBottom:2 }}>{l}</div><div style={{ fontSize:13,fontWeight:600,color:MAY.forest }}>{v}</div></div>)}</div>{k.kwota_total>0&&<ProgBar value={k.kwota_total-k.kwota_pozostala} max={k.kwota_total} color={MAY.sea} label="Spłacono" sublabel={`${Math.round(pct)}% · jeszcze ${latDo} lat`}/>}{odsetki>0&&<div style={{ fontSize:10,color:MAY.forest,opacity:.45,marginTop:4 }}>Szacowane odsetki pozostałe: ~{Math.round(odsetki).toLocaleString("pl-PL")} zł</div>}</Card>;
-    })}
-    <Card><SecTitle>➕ Dodaj kredyt / ratę</SecTitle><div style={{ display:"flex", flexDirection:"column", gap:9 }}><Inp label="Nazwa" value={nazwa} onChange={setNazwa} placeholder="np. Kredyt hipoteczny"/><div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}><Inp label="Kwota kredytu (zł)" value={kwota} onChange={setKwota} type="number" placeholder="400000"/><Inp label="Rata (zł/mies.)" value={rata} onChange={setRata} type="number" placeholder="3530"/></div><div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}><Inp label="Oprocentowanie (%)" value={oprocent} onChange={setOprocent} type="number" placeholder="7.5"/><Inp label="Liczba rat" value={liczbaRat} onChange={setLiczbaRat} type="number" placeholder="360"/></div><Inp label="Data rozpoczęcia" value={dataStart} onChange={setDataStart} type="date"/><Btn onClick={dodaj} disabled={saving||!nazwa||!kwota||!rata} ok={ok}>{ok?"✓ Dodano!":saving?"Zapisuję…":"Dodaj kredyt"}</Btn></div></Card>
-  </div>;
-}
+
 
 // ══════════════════════════════════════════════════════════════════════════
 // PLANER TYGODNIOWY
@@ -491,6 +647,101 @@ function planerWeekDates(offset) {
   return `${fmt(mon)} – ${fmt(sat)}`;
 }
 
+// ══════════════════════════════════════════════════════════════════════════
+// ZAMIANA PRZEPISU
+// ══════════════════════════════════════════════════════════════════════════
+
+function ZamienModal({ day, mealType, currentName, onSelect, onClose }) {
+  const [filter, setFilter] = React.useState('wszystkie');
+  const [search, setSearch] = React.useState('');
+
+  const kategorie = ['wszystkie', 'szejk', 'szybkie', 'kurczak', 'ryba', 'makaron', 'jajka', 'IO', 'maluch', 'bulk'];
+
+  const filtered = Object.entries(PRZEPISY).filter(([nazwa, p]) => {
+    const matchSearch = search === '' || nazwa.toLowerCase().includes(search.toLowerCase());
+    const matchFilter = filter === 'wszystkie' || (p.tagi||[]).includes(filter);
+    return matchSearch && matchFilter;
+  });
+
+  const tagColor = (t) => {
+    if (t==="maluch") return { bg:"#E8F0FB", c:"#2C5282" };
+    if (t==="IO") return { bg:MAY.sun, c:MAY.forest };
+    if (t==="bulk") return { bg:"#EBF2EB", c:"#3B6D3A" };
+    if (t==="szejk"||t==="szybkie") return { bg:MAY.baby, c:MAY.forest };
+    if (t==="kurczak") return { bg:"#FFF3E0", c:"#8B5000" };
+    if (t==="ryba") return { bg:"#E3F2FD", c:"#1565C0" };
+    return { bg:MAY.blush, c:MAY.forest };
+  };
+
+  return (
+    <div style={{ position:"fixed", inset:0, background:"rgba(26,74,58,0.55)", zIndex:600, display:"flex", alignItems:"flex-end", justifyContent:"center" }}
+      onClick={e=>{ if(e.target===e.currentTarget) onClose(); }}>
+      <div style={{ background:MAY.bg, borderRadius:"20px 20px 0 0", padding:"18px 16px 0", width:"100%", maxWidth:480, maxHeight:"90vh", display:"flex", flexDirection:"column" }}>
+
+        {/* Header */}
+        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:10 }}>
+          <div>
+            <div style={{ fontSize:15, fontWeight:700, color:MAY.forest }}>Zamień przepis</div>
+            <div style={{ fontSize:11, color:MAY.forest, opacity:.45 }}>{day} · {mealType} · Teraz: {currentName}</div>
+          </div>
+          <button onClick={onClose} style={{ background:"none", border:"none", fontSize:20, cursor:"pointer", color:MAY.forest, opacity:.3 }}>✕</button>
+        </div>
+
+        {/* Search */}
+        <div style={{ marginBottom:10 }}>
+          <input
+            value={search}
+            onChange={e=>setSearch(e.target.value)}
+            placeholder="🔍 Szukaj przepisu..."
+            style={{ width:"100%", padding:"9px 13px", borderRadius:10, border:`1.5px solid ${MAY.sea}`, background:"white", fontSize:13, color:MAY.forest, outline:"none", boxSizing:"border-box", fontFamily:"inherit" }}
+          />
+        </div>
+
+        {/* Filter chips */}
+        <div style={{ display:"flex", gap:5, overflowX:"auto", paddingBottom:8, marginBottom:4 }}>
+          {kategorie.map(k=>(
+            <button key={k} onClick={()=>setFilter(k)} style={{ flexShrink:0, padding:"4px 11px", borderRadius:16, border:`1.5px solid ${filter===k?"transparent":MAY.sea}`, background:filter===k?MAY.forest:"white", color:filter===k?"white":MAY.forest, fontSize:11, cursor:"pointer", fontFamily:"inherit", fontWeight:filter===k?600:400 }}>
+              {k}
+            </button>
+          ))}
+        </div>
+
+        {/* Recipe list */}
+        <div style={{ overflowY:"auto", flex:1, paddingBottom:24 }}>
+          {filtered.length === 0 && (
+            <div style={{ textAlign:"center", color:MAY.forest, opacity:.3, fontSize:13, padding:24 }}>Brak wyników</div>
+          )}
+          {filtered.map(([nazwa, p])=>{
+            const isCurrent = nazwa === currentName;
+            return (
+              <div key={nazwa}
+                onClick={()=>{ onSelect(nazwa, p); onClose(); }}
+                style={{ display:"flex", alignItems:"flex-start", gap:12, padding:"11px 12px", marginBottom:6, background:isCurrent?"#EBF2EB":"white", borderRadius:12, border:`1.5px solid ${isCurrent?"#C5DAC4":MAY.sea}`, cursor:"pointer" }}>
+                <div style={{ flex:1, minWidth:0 }}>
+                  <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:4 }}>
+                    <div style={{ fontSize:13, fontWeight:600, color:MAY.forest }}>{nazwa}</div>
+                    {isCurrent && <span style={{ fontSize:9, padding:"1px 6px", borderRadius:8, background:"#C5DAC4", color:"#3B6D3A" }}>aktualny</span>}
+                  </div>
+                  <div style={{ display:"flex", gap:4, flexWrap:"wrap", marginBottom:4 }}>
+                    {(p.tagi||[]).map(t=>{ const c=tagColor(t); return <span key={t} style={{ fontSize:9, padding:"1px 6px", borderRadius:8, background:c.bg, color:c.c }}>{t}</span>; })}
+                  </div>
+                  <div style={{ display:"flex", gap:10 }}>
+                    <span style={{ fontSize:10, color:MAY.forest, opacity:.5 }}>🔥 {p.kcal} kcal</span>
+                    <span style={{ fontSize:10, color:MAY.forest, opacity:.5 }}>⏱️ {p.czas}</span>
+                    {p.porcje===2 && <span style={{ fontSize:10, color:"#3B6D3A" }}>🍲 bulk x2</span>}
+                  </div>
+                </div>
+                <div style={{ fontSize:18, color:MAY.sea, flexShrink:0, alignSelf:"center" }}>›</div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
 function PlanerTygodniowy() {
   const [weekOffset, setWeekOffset] = React.useState(0);
   const [subTab, setSubTab] = React.useState('plan');
@@ -500,6 +751,8 @@ function PlanerTygodniowy() {
   const [editModal, setEditModal] = React.useState(null);
   const [editForm, setEditForm] = React.useState({name:'',sub:'',tag:''});
   const [newItems, setNewItems] = React.useState({});
+  const [przepisModal, setPrzepisModal] = React.useState(null);
+  const [zamienModal, setZamienModal] = React.useState(null); // {day, mealType}
 
   React.useEffect(() => {
     const s = localStorage.getItem(planerWeekKey(weekOffset));
@@ -513,6 +766,19 @@ function PlanerTygodniowy() {
 
   function openEdit(day, meal) { const m = planData[day].meals[meal]; setEditForm({name:m.name,sub:m.sub,tag:m.tag||''}); setEditModal({day,meal}); }
   function saveEdit() { const d = JSON.parse(JSON.stringify(planData)); d[editModal.day].meals[editModal.meal] = {...editForm}; savePlan(d); setEditModal(null); }
+
+  function applyZamiana(nazwa, p) {
+    if (!zamienModal) return;
+    const d = JSON.parse(JSON.stringify(planData));
+    const isBuilk = p.porcje === 2;
+    d[zamienModal.day].meals[zamienModal.mealType] = {
+      name: nazwa,
+      sub: (p.skladniki||[]).slice(0,3).join(', ').slice(0,60) + (isBuilk ? ' — gotuj x2' : ''),
+      tag: isBuilk ? 'cook' : (p.tagi||[]).includes('maluch') ? 'baby' : ''
+    };
+    savePlan(d);
+    setZamienModal(null);
+  }
 
   function toggleItem(ci,ii) { const d = JSON.parse(JSON.stringify(shopData)); d[ci].items[ii].checked = !d[ci].items[ii].checked; saveShop(d); }
   function addItem(ci) { const v = (newItems[ci]||'').trim(); if (!v) return; const d = JSON.parse(JSON.stringify(shopData)); d[ci].items.push({n:v,a:'',checked:false}); saveShop(d); setNewItems(x=>({...x,[ci]:''})); }
@@ -621,14 +887,19 @@ function PlanerTygodniowy() {
                         return (
                           <div key={mt}>
                             <div style={S.mealType}>{mt}</div>
-                            <div style={S.mealBox}
-                              onMouseEnter={e=>{const b=e.currentTarget.querySelector('button');if(b)b.style.opacity='1';}}
-                              onMouseLeave={e=>{const b=e.currentTarget.querySelector('button');if(b)b.style.opacity='0';}}>
-                              <button style={S.editBtn} onClick={()=>openEdit(day,mt)}>✎</button>
+                            <div style={{...S.mealBox, cursor:PRZEPISY[m.name]?'pointer':'default'}}
+                              onClick={()=>{if(PRZEPISY[m.name]) setPrzepisModal(m.name);}}
+                              onMouseEnter={e=>{e.currentTarget.querySelectorAll('.planer-edit-btn').forEach(b=>b.style.opacity='1');}}
+                              onMouseLeave={e=>{e.currentTarget.querySelectorAll('.planer-edit-btn').forEach(b=>b.style.opacity='0');}}>
+                              <div style={{position:"absolute",top:4,right:4,display:"flex",gap:3}}>
+                              <button className="planer-edit-btn" style={{...S.editBtn,position:"static",opacity:"inherit"}} onClick={e=>{e.stopPropagation();setZamienModal({day,mealType:mt,currentName:m.name});}}>⇄</button>
+                              <button className="planer-edit-btn" style={{...S.editBtn,position:"static",opacity:"inherit"}} onClick={e=>{e.stopPropagation();openEdit(day,mt);}}>✎</button>
+                            </div>
                               <div style={S.mealName}>{m.name||'—'}</div>
                               {m.sub && <div style={S.mealSub}>{m.sub}</div>}
                               {m.tag==='cook' && <span style={S.mealTagCook}>gotuj x2</span>}
                               {m.tag==='baby' && <span style={S.mealTagBaby}>ok dla malucha</span>}
+                              {PRZEPISY[m.name] && <span style={{fontSize:9,color:MAY.sea,display:'block',marginTop:3}}>👆 tap po przepis</span>}
                             </div>
                           </div>
                         );
@@ -674,6 +945,9 @@ function PlanerTygodniowy() {
         </div>
       )}
 
+      {przepisModal && <PrzepisModal nazwa={przepisModal} onClose={()=>setPrzepisModal(null)}/>}
+      {zamienModal && <ZamienModal day={zamienModal.day} mealType={zamienModal.mealType} currentName={zamienModal.currentName} onSelect={applyZamiana} onClose={()=>setZamienModal(null)}/>}
+
       {editModal && (
         <div style={S.overlay} onClick={e=>e.target===e.currentTarget&&setEditModal(null)}>
           <div style={S.modal}>
@@ -706,14 +980,10 @@ const TABS = [
   { id:"dashboard", ico:"🏠", lbl:"Dom" },
   { id:"analiza",   ico:"📊", lbl:"Analiza" },
   { id:"wydatki",   ico:"💸", lbl:"Wydatki" },
-  { id:"zakupy",    ico:"🛒", lbl:"Zakupy" },
-  { id:"posilki",   ico:"🍽️", lbl:"Posiłki" },
   { id:"zadania",   ico:"✅", lbl:"Zadania" },
   { id:"zarobki",   ico:"💼", lbl:"Zarobki" },
   { id:"oplaty",    ico:"📋", lbl:"Opłaty" },
   { id:"cele",      ico:"🎯", lbl:"Cele" },
-  { id:"remont",    ico:"🏗️", lbl:"Remont" },
-  { id:"kredyty",   ico:"💳", lbl:"Kredyty" },
   { id:"planer",    ico:"🥗", lbl:"Planer" },
 ];
 
@@ -723,18 +993,14 @@ export default function App() {
   const [loading, setLoading] = useState(true);
 
   const reload = useCallback(async () => {
-    const [w,z,p,t,zar,o,c,r,k] = await Promise.all([
+    const [w,t,zar,o,c] = await Promise.all([
       db("wydatki","GET",null,"?order=created_at.desc&limit=50"),
-      db("zakupy","GET",null,"?order=created_at.desc&limit=100"),
-      db("posilki","GET",null,"?order=created_at.asc&limit=100"),
       db("zadania","GET",null,"?order=created_at.asc&limit=100"),
       db("zarobki","GET",null,"?order=created_at.asc&limit=24"),
       db("oplaty","GET",null,"?order=created_at.asc&limit=100"),
       db("cele","GET",null,"?order=created_at.asc&limit=20"),
-      db("remont_etapy","GET",null,"?order=kolejnosc.asc&limit=20"),
-      db("kredyty","GET",null,"?order=created_at.asc&limit=20"),
     ]);
-    setData({ wydatki:w||[], zakupy:z||[], posilki:p||[], zadania:t||[], zarobki:zar||[], oplaty:o||[], cele:c||[], remont_etapy:r||[], kredyty:k||[] });
+    setData({ wydatki:w||[], zakupy:[], posilki:[], zadania:t||[], zarobki:zar||[], oplaty:o||[], cele:c||[], remont_etapy:[], kredyty:[] });
     setLoading(false);
   }, []);
 
@@ -751,14 +1017,10 @@ export default function App() {
     dashboard: <Dashboard data={data} setTab={setTab}/>,
     analiza:   <Analiza data={data}/>,
     wydatki:   <Wydatki data={data} reload={reload}/>,
-    zakupy:    <Zakupy data={data} reload={reload}/>,
-    posilki:   <Posilki data={data} reload={reload}/>,
     zadania:   <Zadania data={data} reload={reload}/>,
     zarobki:   <Zarobki data={data} reload={reload}/>,
     oplaty:    <Oplaty data={data} reload={reload}/>,
     cele:      <Cele data={data} reload={reload}/>,
-    remont:    <Remont data={data} reload={reload}/>,
-    kredyty:   <Kredyty data={data} reload={reload}/>,
     planer:    <PlanerTygodniowy />,
   };
 
