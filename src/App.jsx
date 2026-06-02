@@ -485,6 +485,230 @@ const PRZEPISY = {
     skladniki:["150g piersi kurczaka","100g ryżu dzikiego","100ml mleczka kokosowego","0,5 łyżki oleju kokosowego","12g pietruszki","3g kolendry suszonej","10g szczypiorku","1 ząbek czosnku","sól"],
     wykonanie:"1. Mleczko kokosowe zmiksować z ziołami (pietruszka, kolendra, szczypiorek).\n2. Kurczaka usmażyć, podlać wodą i dusić 10 min. Wyjąć.\n3. Na tej samej patelni podsmażyć czosnek 2-3 min.\n4. Wlać zielone mleczko. Gotować 9-10 min do zgęstnienia.\n5. Ugotować ryż dziki.\n6. Ułożyć kurczaka na ryżu, zalać sosem.",
   },
+
+  // ── JADŁOSPIS IO (insulinooporność) – tydzień 1 ──────────────────────────
+
+  "Kanapki z pastą jajeczną i awokado": {
+    kcal:593, czas:"15 min", porcje:1, tagi:["jajka","szybkie","IO","maluch"],
+    skladniki:["2 jajka (112g)","140g awokado","10g serka kremowego","5g szczypiorku","2 kromki chleba żytniego razowego (60g)","1 pomidor (140g)","sól, pieprz"],
+    wykonanie:"1. Jajka ugotować na twardo (~10 min). Obrać i przełożyć do miski.\n2. Dodać awokado bez skórki i serek kremowy. Doprawić solą i pieprzem.\n3. Rozgnieść widelcem lub zblendować.\n4. Posiekać szczypiorek, dodać do pasty.\n5. Nałożyć na kanapki, podać z pokrojonym pomidorem.",
+    uwaga:"70g awokado możesz zamienić na 1,5 jajka.",
+  },
+  "Wysokobiałkowy koktajl czekoladowy z bananem": {
+    kcal:411, czas:"5 min", porcje:1, tagi:["szejk","szybkie","IO","maluch"],
+    skladniki:["60g banana (0,5 szt.)","200g serka wiejskiego naturalnego","100ml mleka 2%","10g kakao 16%","5g erytrolu","10g masła orzechowego"],
+    wykonanie:"Banana obrać, umieścić w blenderze. Dodać serek wiejski, mleko, kakao, erytrol i masło orzechowe. Zblendować na gładką masę.",
+  },
+  "Kurczak z boczniakami w sosie Teriyaki z ryżem": {
+    kcal:562, czas:"30 min", porcje:2, tagi:["kurczak","IO","maluch","bulk"],
+    skladniki:["400g piersi kurczaka","100g ryżu brązowego","300g boczniaków","135g marchewki","30ml sosu sojowego","10ml oliwy","9ml octu jabłkowego","15g erytrolu","10g czosnku","20g sezamu"],
+    wykonanie:"1. Wymieszać sos sojowy, oliwę, ocet, erytrol i przeciśnięty czosnek.\n2. Kurczaka pokroić w paski, zalać połową sosu. Marynować min. 1h (najlepiej całą noc).\n3. Ugotować ryż wg instrukcji.\n4. Wyłożyć mięso na suchą patelnię, dusić pod przykryciem.\n5. Boczniaki rozerwać w paski, marchewkę obrać i pokroić w cienkie plastry.\n6. Dodać warzywa i resztę sosu, dusić 5 min.\n7. Podać z ryżem, posypać sezamem.",
+    uwaga:"Gotuj porcję x2 — starcza na poniedziałek i wtorek. Boczniaki możesz zamienić na pieczarki, kalafiora lub cukinię.",
+  },
+  "Bananowe serniczki z borówkami": {
+    kcal:330, czas:"20 min", porcje:2, tagi:["jajka","IO","maluch","bulk"],
+    skladniki:["60g banana (0,5 szt.)","100g serka wiejskiego","75g skyru waniliowego","45g mąki orkiszowej","56g jajka (1 szt.)","10g budyniu waniliowego bez cukru","150g borówek","5ml oliwy","3g proszku do pieczenia"],
+    wykonanie:"1. Serek wiejski umieścić w misce, dodać połowę skyru.\n2. Banana rozgnieść widelcem.\n3. Wymieszać wszystko z mąką, jajkiem, budyniem i proszkiem do pieczenia — mieszać bez grudek.\n4. Rozgrzać oliwę na patelni, wykładać łyżką ciasto. Smażyć pod przykryciem.\n5. Porcję podzielić na 2 — podać z resztą skyru i borówkami.",
+    uwaga:"Gotuj x2 porcje — druga na jutro. Borówki możesz zamienić na jagody, maliny lub truskawki.",
+  },
+  "Tortilla z awokado i szynką": {
+    kcal:490, czas:"5 min", porcje:1, tagi:["szybkie","IO","maluch"],
+    skladniki:["1 tortilla pełnoziarnista (61g)","140g awokado","30g szynki delikatesowej z kurczaka (2 plastry)","20g rukoli","70g papryki czerwonej"],
+    wykonanie:"Tortillę posmarować awokado, ułożyć szynkę, rukolę i paski papryki. Zawinąć w rulon lub złożyć na trójkąt. Podpiec na suchej patelni lub w tosterze.",
+  },
+  "Gofry z tuńczykiem i serkiem": {
+    kcal:372, czas:"20 min", porcje:2, tagi:["ryba","IO","bulk"],
+    skladniki:["56g jajka (1 szt.)","30g mąki orkiszowej","40g sera mozzarella tartego","3g proszku do pieczenia","170g tuńczyka w sosie własnym","15ml oliwy","30g serka kremowego","40g rukoli","140g pomidora","90g rzodkiewki"],
+    wykonanie:"1. Jajko wbić do miski, dodać mąkę, mozzarellę, proszek do pieczenia i odsączonego tuńczyka. Wymieszać.\n2. Rozgrzać gofrownicę, posmarować oliwą, wyłożyć ciasto.\n3. Zapiekać do ścięcia.\n4. Z pomidora, rukoli i rzodkiewki przygotować sałatkę, polać resztą oliwy.\n5. Gotowe gofry posmarować serkiem, podać z sałatką.",
+    uwaga:"Gotuj x2 — druga porcja na jutro. Tuńczyka możesz zamienić na szynkę.",
+  },
+  "Nocna owsianka orzechowo-malinowa": {
+    kcal:489, czas:"10 min", porcje:1, tagi:["szybkie","IO","maluch"],
+    skladniki:["100g sera twarogowego chudego","75g skyru waniliowego","50g płatków owsianych górskich","15g masła orzechowego","120g malin"],
+    wykonanie:"Twaróg, skyr, płatki owsiane i masło orzechowe zblendować na gładką masę. Przełożyć do słoiczka i wstawić do lodówki. Rano dodać maliny.",
+    uwaga:"Przygotuj wieczór wcześniej — minimum 6h w lodówce. Wybieraj płatki górskie, nie błyskawiczne.",
+  },
+  "Serek wiejski tzatziki": {
+    kcal:436, czas:"5 min", porcje:1, tagi:["szybkie","IO"],
+    skladniki:["200g serka wiejskiego naturalnego","80g ogórka","8g kopru ogrodowego","10ml oliwy","czosnek, sól, pieprz","2 kromki chleba żytniego razowego (60g)"],
+    wykonanie:"Koperek posiekać, ogórka zetrzeć na tarce. Serek wiejski umieścić w misce, dodać warzywa i przyprawy (sól, pieprz, czosnek). Skropić oliwą. Podać z pieczywem.",
+  },
+  "Makaron z pieczoną fetą i pomidorkami": {
+    kcal:542, czas:"40 min", porcje:2, tagi:["wegetariańskie","IO","bulk"],
+    skladniki:["140g makaronu penne pełnoziarnistego","300g pomidorków koktajlowych","150g sera feta","15g czosnku (3 ząbki)","15ml oliwy","3 liście świeżej bazylii","słodka papryka, sól, pieprz"],
+    wykonanie:"1. Piekarnik nagrzać do 180°C.\n2. W naczyniu żaroodpornym umieścić fetę, pomidorki, czosnek i oliwę. Przyprawić.\n3. Piec 30 min.\n4. Ugotować makaron al dente.\n5. Wyjąć naczynie, wymieszać i rozgnieść widelcem — sos gotowy.\n6. Podać z makaronem, udekorować bazylią.",
+    uwaga:"Gotuj x2 — starcza na środę i czwartek. Fetę możesz zastąpić mozzarellą (wtedy nie piecz, dodaj startą na gotową potrawę).",
+  },
+  "Muffin z jajkiem rukolą i szynką": {
+    kcal:540, czas:"15 min", porcje:1, tagi:["jajka","IO","maluch"],
+    skladniki:["2 jajka (112g)","1 bułka pełnoziarnista (65g)","40g rukoli","45g szynki delikatesowej z kurczaka","50g sera twarogowego chudego","30ml śmietany 12%","60g rzodkiewki","5ml oliwy","sól, pieprz"],
+    wykonanie:"1. Rozgrzać oliwę na patelni, usmażyć jajka sadzone.\n2. Obok podsmażyć szynkę w kawałkach.\n3. Na drugiej patelni ztostować bułkę.\n4. Twaróg wymieszać ze śmietaną, doprawić solą i pieprzem.\n5. Na bułce ułożyć twaróg, rukolę, rzodkiewkę, szynkę, jajka sadzone i drugą połówkę bułki.",
+  },
+  "Ciasteczkowy deser wysokobiałkowy": {
+    kcal:273, czas:"10 min", porcje:1, tagi:["szybkie","IO"],
+    skladniki:["2 herbatniki (10g)","100g sera twarogowego chudego","10ml śmietany 12%","10g serka kremowego","50ml mleka 2%","100g borówek","5g erytrolu"],
+    wykonanie:"Herbatniki rozgnieść i umieścić na dnie słoiczka. Twaróg zmiksować ze śmietaną, serkiem kremowym i mlekiem. Do masy dodać część borówek, wymieszać delikatnie. Wyłożyć masę na herbatniki, posypać pozostałymi borówkami.",
+  },
+  "Krem z pieczonej papryki i pomidorów": {
+    kcal:372, czas:"35 min", porcje:2, tagi:["zupa","IO","bulk"],
+    skladniki:["150g papryki czerwonej","280g pomidorów","15g czosnku (3 ząbki)","500ml bulionu warzywnego","200g serka wiejskiego","40ml śmietany 12%","2 kromki chleba żytniego razowego (60g)","20g słonecznika","10ml oliwy","zioła prowansalskie, sól, pieprz"],
+    wykonanie:"1. Piekarnik nagrzać do 200°C.\n2. Paprykę i pomidory pokroić, wydrążyć. Ułożyć na blaszce z papierem z czosnkiem.\n3. Piec ~20 min.\n4. Zagrzać bulion, dodać pieczone warzywa i czosnek. Doprawić ziołami.\n5. Zblendować z serkiem wiejskim i śmietaną.\n6. Chleb pokroić w kostkę, podprażyć na suchej patelni.\n7. Podawać z grzankami i słonecznikiem.",
+    uwaga:"Gotuj x2 — starcza na czwartek i piątek.",
+  },
+  "Łosoś w sosie szpinakowym z kaszą bulgur": {
+    kcal:597, czas:"30 min", porcje:1, tagi:["ryba","łosoś","IO","maluch"],
+    skladniki:["120g łososia świeżego","40g kaszy bulgur","100g szpinaku","60ml śmietany 12%","100g pomidorków koktajlowych","100g cebuli","10g czosnku (2 ząbki)","5ml oliwy","słodka papryka, sól, pieprz"],
+    wykonanie:"1. Kaszę ugotować wg instrukcji.\n2. Cebulę i pomidorki pokroić w kostkę.\n3. Rozgrzać oliwę, podsmażyć cebulę i szpinak.\n4. Dodać łososia, dusić pod przykryciem.\n5. Kiedy ryba będzie ścięta, rozdrobnić szpatułką, dodać śmietanę.\n6. Doprawić czosnkiem, solą, pieprzem i słodką papryką.\n7. Podać z kaszą.",
+    uwaga:"Łososia możesz zamienić na kurczaka lub dorsza.",
+  },
+  "Jajo chlebki z warzywami": {
+    kcal:447, czas:"15 min", porcje:1, tagi:["jajka","IO","maluch"],
+    skladniki:["56g jajka (1 szt.)","45g szynki delikatesowej z kurczaka (3 plastry)","30g sera mozzarella tartego","80g papryki czerwonej","50g cebuli","75g rzodkiewki","2 kromki chleba żytniego razowego (60g)","5ml oliwy"],
+    wykonanie:"1. Szynkę, paprykę i cebulę pokroić w kostkę.\n2. Do miski wbić jajko, dodać warzywa i szynkę z serem. Wymieszać.\n3. Rozgrzać oliwę, wylać omlet.\n4. Chleb ułożyć na środku omleta, nałożyć omlet z obu stron — złożyć jak kanapkę.\n5. Smażyć jeszcze chwilę. Podać z rzodkiewkami.",
+  },
+  "Pełnoziarnisty jabłecznik z budyniem": {
+    kcal:425, czas:"50 min", porcje:2, tagi:["IO","bulk"],
+    skladniki:["100g mąki orkiszowej","40g serka kremowego","56g jajka (1 szt.)","300g jabłek","25g budyniu waniliowego bez cukru","150ml mleka 2%","30g erytrolu","10g cynamonu","3g proszku do pieczenia"],
+    wykonanie:"1. Piekarnik nagrzać do 170°C.\n2. Serek kremowy utrzeć z mąką, jajkiem, proszkiem do pieczenia i erytrolem. Podzielić ciasto na 2 części — jedną schować do lodówki.\n3. Rozłożyć pierwszą część na blaszkę z papierem, nakłuć widelcem.\n4. Jabłka zetrzeć na tarce, odsączyć, doprawić cynamonem. Rozłożyć na cieście.\n5. Budyń ugotować na mleku (można dodać erytrol). Wylać na jabłka.\n6. Zetrzeć schłodzoną drugą część ciasta na górę.\n7. Piec 35–40 min.",
+    uwaga:"Gotuj x2 — starcza na sobotę i niedzielę.",
+  },
+  "Brokułowa sałatka z fetą i słonecznikiem": {
+    kcal:336, czas:"15 min", porcje:2, tagi:["wegetariańskie","IO","bulk"],
+    skladniki:["300g brokułów","120g sera feta","60ml śmietany 12%","30g słonecznika łuskanego","5g czosnku (1 ząbek)","sól, pieprz"],
+    wykonanie:"1. Brokuł ugotować we wrzącej wodzie 3–4 min. Zahartować w zimnej wodzie.\n2. Ser pokroić w kostkę.\n3. Do śmietany dodać przeciśnięty czosnek, sól i pieprz. Wymieszać.\n4. Brokuł wymieszać z fetą i sosem. Posypać słonecznikiem.",
+    uwaga:"Gotuj x2 — starcza na piątek i sobotę.",
+  },
+  "Kotlety z cukinią i marchewką z ziemniakami": {
+    kcal:501, czas:"40 min", porcje:2, tagi:["kurczak","IO","maluch","bulk"],
+    skladniki:["300g mielonego mięsa z kurczaka","300g cukinii","135g marchewki","350g ziemniaków","20g parmezanu","13ml oliwy","słodka papryka, czosnek, zioła prowansalskie, sól, pieprz"],
+    wykonanie:"1. Piekarnik nagrzać do 200°C.\n2. Połowę cukinii pokroić w paski, ziemniaki w łódeczki. Wymieszać z parmezanem, 3ml oliwy i ziołami. Piec ~30 min.\n3. Resztę cukinii zetrzeć, zasypać solą, odstawić. Marchewkę zetrzeć.\n4. Odsączyć cukinię, wymieszać z marchewką i mięsem. Doprawić.\n5. Uformować kotlety, smażyć pod przykryciem z obu stron.\n6. Podać z pieczonymi ziemniakami i cukinią.",
+    uwaga:"Gotuj x2 — starcza na sobotę i niedzielę.",
+  },
+  "Tosty z serka wiejskiego": {
+    kcal:503, czas:"20 min", porcje:1, tagi:["jajka","szybkie","IO","maluch"],
+    skladniki:["100g serka wiejskiego naturalnego","2 jajka (112g)","40g sera mozzarella tartego","30g szynki delikatesowej z kurczaka","25g serka kremowego","100g pomidorków koktajlowych","sól, pieprz"],
+    wykonanie:"Serek wiejski umieścić w misce z szynką, tartą mozzarellą i jajkami. Doprawić. Rozłożyć masę w tosterze lub usmażyć placuszki na patelni. Gotowe tosty posmarować serkiem, zjeść z pomidorkami koktajlowymi.",
+  },
+  "Kanapki z pastą z tuńczyka i cebulką": {
+    kcal:401, czas:"5 min", porcje:1, tagi:["ryba","szybkie","IO"],
+    skladniki:["170g tuńczyka w sosie własnym","20g serka kremowego","50g cebuli","2 kromki chleba żytniego razowego (60g)","120g ogórka","sól, pieprz"],
+    wykonanie:"Cebulkę posiekać na drobną kostkę. Tuńczyka wymieszać z serkiem kremowym i cebulką, doprawić solą i pieprzem. Nałożyć pastę na chleb. Zjeść z ogórkiem.",
+  },
+
+  // ── JADŁOSPIS IO – tydzień 2 ─────────────────────────────────────────────
+
+  "Marchewkowa owsianka z masłem orzechowym": {
+    kcal:437, czas:"10 min", porcje:1, tagi:["ciepłe","IO","maluch"],
+    skladniki:["45g marchewki","150g jabłka","40g płatków owsianych górskich","100g jogurtu greckiego","10g masła orzechowego","5g erytrolu","50ml mleka 2%","cynamon do smaku"],
+    wykonanie:"1. Marchewkę i połowę jabłka zetrzeć na tarce.\n2. Płatki owsiane podgotować na mleku ~2 min z cynamonem i erytrolem.\n3. Do gotującej owsianki dodać marchewkę i jabłko, poddusić chwilę.\n4. Przełożyć do miski, dodać jogurt, masło orzechowe i resztę pokrojonego jabłka.",
+    uwaga:"Wybieraj płatki górskie — więcej błonnika niż błyskawiczne.",
+  },
+  "Pełnoziarnista bułka z serem i ogórkiem kiszonym": {
+    kcal:374, czas:"5 min", porcje:1, tagi:["szybkie","IO"],
+    skladniki:["1 bułka pełnoziarnista (65g)","30g sera żółtego","20g serka kremowego","150g ogórków kiszonych"],
+    wykonanie:"Bułkę posmarować serkiem kremowym, ułożyć plasterki sera żółtego. Podać z ogórkami kiszonymi.",
+    uwaga:"Ogórki kiszone możesz zamienić na surowe lub inną warzywę — paprykę, pomidory.",
+  },
+  "Makaron z pesto kurczakiem i warzywami": {
+    kcal:613, czas:"25 min", porcje:2, tagi:["kurczak","IO","bulk"],
+    skladniki:["120g makaronu penne pełnoziarnistego","400g piersi kurczaka","225g papryki czerwonej","300g cukinii","30g pesto zielonego z bazylii","20g słonecznika łuskanego","10ml oliwy","oregano, chili, słodka papryka, sól, pieprz"],
+    wykonanie:"1. Makaron ugotować wg instrukcji.\n2. Mięso i warzywa pokroić w kostkę.\n3. Rozgrzać oliwę, podsmażyć mięso z warzywami. Dusić pod przykryciem, przyprawić.\n4. Odcedzić makaron, dodać na patelnię. Dodać pesto, wymieszać.\n5. Przełożyć na talerz, posypać słonecznikiem.",
+    uwaga:"Gotuj x2 — starcza na poniedziałek i wtorek. Makaron możesz zamienić na kaszę gryczaną, pęczak lub brązowy ryż. Gotuj al dente.",
+  },
+  "Placki z kalafiora z sosem czosnkowym": {
+    kcal:375, czas:"15 min", porcje:2, tagi:["wegetariańskie","IO","maluch","bulk"],
+    skladniki:["300g kalafiora","112g jajek (2 szt.)","20g mąki orkiszowej","50g suszonych pomidorów w oleju (odsączonych)","150g jogurtu greckiego","5g czosnku (1 ząbek)","20ml oliwy","czosnek, słodka papryka, curry, zioła prowansalskie, sól, pieprz"],
+    wykonanie:"1. Kalafior rozdrobnić blenderem lub nożem.\n2. Wymieszać z jajkami, mąką, posiekanymi suszonymi pomidorami i przyprawami.\n3. Na rozgrzaną oliwę wykładać łyżką ciasto. Smażyć z obu stron do zarumienienia.\n4. Czosnek przecisnąć do jogurtu, doprawić solą i pieprzem.\n5. Podać placki z sosem.",
+    uwaga:"Gotuj x2 — starcza na poniedziałek i wtorek. Kalafior możesz zamienić na brokuła lub cukinię.",
+  },
+  "Razowe tosty z serem i szynką": {
+    kcal:378, czas:"10 min", porcje:1, tagi:["ciepłe","IO","maluch"],
+    skladniki:["2 kromki chleba żytniego razowego (60g)","30g sera żółtego","50g szynki delikatesowej z kurczaka","150g papryki czerwonej","2ml oliwy"],
+    wykonanie:"Rozgrzać oliwę, podprażyć chleb z obu stron. Na chlebie ułożyć szynkę, ser i zapiec pod przykryciem. Podawać z paskami papryki.",
+  },
+  "Cukiniowe brownie": {
+    kcal:400, czas:"40 min", porcje:2, tagi:["IO","bulk"],
+    skladniki:["300g cukinii","112g jajek (2 szt.)","20g kakao 16%","50g mąki orkiszowej","40g czekolady gorzkiej","20g erytrolu","10ml oliwy","3g proszku do pieczenia"],
+    wykonanie:"1. Piekarnik nagrzać do 180°C.\n2. Cukinię zetrzeć na małych oczkach. Czekoladę rozpuścić lub posiekać.\n3. Wymieszać odsączoną cukinię, jajka, mąkę, erytrol, połowę oliwy, proszek do pieczenia i czekoladę z kakao.\n4. Resztą oliwy posmarować naczynie. Wylać masę.\n5. Piec ~30 min.",
+    uwaga:"Gotuj x2 — starcza na wtorek i środę.",
+  },
+  "Bajgiel z serkiem sałatą i łososiem": {
+    kcal:466, czas:"5 min", porcje:1, tagi:["szybkie","IO"],
+    skladniki:["1 bajgiel pełnoziarnisty (70g)","20g serka kremowego","100g łososia wędzonego","100g ogórka","35g sałaty rzymskiej"],
+    wykonanie:"Bajgla przekroić na pół, posmarować serkiem. Ułożyć wędzonego łososia i pokrojonego ogórka. Resztę ogórka zjeść osobno.",
+  },
+  "Sałatka z tuńczykiem i awokado": {
+    kcal:465, czas:"5 min", porcje:2, tagi:["ryba","IO","bulk"],
+    skladniki:["340g tuńczyka w sosie własnym","140g awokado","50g cebuli","100g ogórka","50g sałaty rzymskiej","20ml oliwy","10g musztardy","2 kromki chleba żytniego razowego (60g)","sól, pieprz"],
+    wykonanie:"1. Pokroić cebulę, ogórka i awokado. Sałatę umyć i podrzyj.\n2. Oliwę wymieszać z musztardą, solą i pieprzem.\n3. Warzywa umieścić w misce, dodać odsączonego tuńczyka, polać sosem.\n4. Podać z pieczywem.",
+    uwaga:"Gotuj x2 — starcza na środę i czwartek.",
+  },
+  "Dorsz słodko kwaśny z kaszą gryczaną": {
+    kcal:423, czas:"25 min", porcje:1, tagi:["ryba","IO","maluch"],
+    skladniki:["200g dorsza świeżego","40g kaszy gryczanej","150g fasolki szparagowej","5ml oliwy","20g keczupu","18ml soku z cytryny","5g czosnku","papryka ostra, słodka, wędzona, sól, pieprz"],
+    wykonanie:"1. Piekarnik nagrzać do 200°C.\n2. Kaszę ugotować. Pod koniec gotowania dodać fasolkę (może być mrożona).\n3. Keczup wymieszać z sokiem z cytryny i przyprawami.\n4. Rybę ponacinać lekko, posypać solą i pieprzem. Natrzeć sosem, skropić oliwą.\n5. Piec ~20 min.\n6. Podać z kaszą i fasolką.",
+    uwaga:"Dorsza możesz zamienić na mintaja, solę, mirunę, kurczaka, krewetki lub tofu.",
+  },
+  "Ziołowy serek z grzanką": {
+    kcal:453, czas:"10 min", porcje:1, tagi:["szybkie","IO"],
+    skladniki:["200g serka wiejskiego naturalnego","20g serka kremowego","10g kopru ogrodowego","12g pietruszki listków","20g cebuli dymki","2 kromki chleba żytniego razowego (60g)","100g ogórka","100g pomidorków koktajlowych","5g czosnku","sól, pieprz"],
+    wykonanie:"Serek wiejski zmiksować z serkiem kremowym i ziołami (koper, pietruszka, szczypiorek, tymianek — do wyboru). Doprawić czosnkiem, solą i pieprzem. Chleb podpiec na suchej patelni. Podać w miseczce z grzankami i pokrojonymi warzywami.",
+  },
+  "Zielona zapiekanka z piekarnika": {
+    kcal:462, czas:"40 min", porcje:2, tagi:["wegetariańskie","IO","bulk"],
+    skladniki:["400g brokułów","90g marchewki","112g jajek (2 szt.)","60g sera mozzarella","200g serka wiejskiego","30g sera żółtego","10ml oliwy","50g jogurtu greckiego","pietruszka, bazylia, słodka papryka, czosnek, chili, sól, pieprz"],
+    wykonanie:"1. Piekarnik nagrzać do 200°C.\n2. Warzywa zetrzeć na tarce. Serek wiejski zblendować. Mozzarellę i ser żółty zetrzeć.\n3. W misce wymieszać warzywa, mozzarellę, zblendowany serek, jajka i przyprawy.\n4. Naczynie żaroodporne posmarować oliwą, wyłożyć masę.\n5. Piec 30–35 min.\n6. Na górę wyłożyć ser żółty, piec aż się rozpuści.\n7. Podawać z jogurtem greckim.",
+    uwaga:"Gotuj x2 — starcza na czwartek i piątek. Brokuła możesz zamienić na kalafiora.",
+  },
+  "Gryczanka z czekoladą i truskawkami": {
+    kcal:398, czas:"15 min", porcje:1, tagi:["IO","maluch"],
+    skladniki:["50g kaszy gryczanej","100ml mleka 2%","75g skyru waniliowego","10g czekolady gorzkiej","5g kakao 16%","100g truskawek","10g erytrolu"],
+    wykonanie:"1. Kaszę ugotować na mleku i wodzie. Kiedy za rzadka — odparować.\n2. Do lekko przestudzonej kaszy dodać kakao, erytrol, posiekaną czekoladę i skyr.\n3. Przełożyć do miski, podać z truskawkami.",
+    uwaga:"Kaszę możesz zamienić na płatki owsiane. Truskawki mogą być mrożone lub zamienione na maliny, borówki.",
+  },
+  "Kanapki z koperkową pastą z łososia": {
+    kcal:407, czas:"10 min", porcje:1, tagi:["ryba","szybkie","IO"],
+    skladniki:["100g łososia wędzonego","20g serka kremowego","10g kopru ogrodowego","75g papryki czerwonej","50g rzodkiewki","12ml soku z cytryny","2 kromki chleba żytniego razowego (60g)"],
+    wykonanie:"Serek kremowy umieścić w misce, dodać łososia wędzonego, sok z cytryny i posiekany koperek. Wymieszać. Pastę rozsmarować na pieczywie, zjeść z paskami papryki i rzodkiewką.",
+  },
+  "Pudding chia z kokosem i malinami": {
+    kcal:385, czas:"10 min", porcje:1, tagi:["szybkie","IO","maluch"],
+    skladniki:["30g nasion chia","10g wiórków kokosowych","75g skyru waniliowego","200g malin","50ml mleka 2%","5g erytrolu"],
+    wykonanie:"Połowę malin lekko zmiksować z mlekiem i erytrolem. Wymieszać masę malinową z nasionami chia, wiórkami kokosowymi i skyrem. Na górę wyłożyć pozostałe maliny. Odstaw do lodówki min. 1h do napęcznienia.",
+  },
+  "Proteinowa pizza": {
+    kcal:526, czas:"25 min", porcje:2, tagi:["IO","bulk"],
+    skladniki:["250g sera twarogowego chudego","112g jajek (2 szt.)","70g mąki orkiszowej","200g pomidorów w puszce krojonych","100g szynki delikatesowej z kurczaka","20g szpinaku","30g sera żółtego","10ml oliwy","3g proszku do pieczenia","zioła prowansalskie, sól, pieprz"],
+    wykonanie:"1. Piekarnik nagrzać do 200°C.\n2. Twaróg wymieszać z jajkiem, proszkiem do pieczenia, mąką i przyprawami.\n3. Na blaszkę z papierem wyłożyć masę — cienki placek. Piec ~20 min do zarumienienia.\n4. Pomidory wymieszać z ziołami, solą i pieprzem.\n5. Obrócić placek, wyłożyć pomidory, szynkę i szpinak. Na górę ser żółty.\n6. Piec do rozpuszczenia sera.",
+    uwaga:"Gotuj x2 — starcza na piątek i sobotę.",
+  },
+  "Bowl z mozzarellą kaszą i warzywami": {
+    kcal:385, czas:"10 min", porcje:1, tagi:["wegetariańskie","IO","maluch"],
+    skladniki:["30g kaszy gryczanej","65g mozzarelli","100g pomidorków koktajlowych","100g ogórka","50g cebuli","10g musztardy","5ml oliwy","12ml soku z cytryny"],
+    wykonanie:"1. Kaszę ugotować wg instrukcji.\n2. Warzywa i mozzarellę pokroić.\n3. Oliwę wymieszać z musztardą i sokiem z cytryny (można dodać ulubione przyprawy).\n4. Kaszę wyłożyć do miseczki, na górę warzywa i ser. Polać dressingiem.",
+  },
+  "Czekoladowy omlet z truskawkami": {
+    kcal:450, czas:"20 min", porcje:1, tagi:["jajka","IO","maluch"],
+    skladniki:["2 jajka (112g)","10g kakao 16%","6g czekolady gorzkiej","30g mąki orkiszowej","10g erytrolu","100g truskawek","50ml mleka 2%","5ml oliwy"],
+    wykonanie:"1. Oddzielić białka od żółtek, białko ubić na sztywną pianę.\n2. Żółtka, erytrol, kakao, mleko i mąkę wymieszać na gładką masę.\n3. Posiekać czekoladę i pokroić truskawki. Połowę owoców dodać do masy z czekoladą.\n4. Delikatnie połączyć z ubitymi białkami.\n5. Rozgrzać oliwę, wylać masę. Smażyć na małym ogniu z obu stron do ścięcia.\n6. Podać z resztą truskawek.",
+  },
+  "Serowy kurczak w sosie curry z ziemniakami": {
+    kcal:511, czas:"30 min", porcje:2, tagi:["kurczak","IO","maluch","bulk"],
+    skladniki:["400g piersi kurczaka","300g ziemniaków","30g sera żółtego","100g jogurtu greckiego","100g cebuli","3g curry","5g erytrolu","50g szpinaku","400g pomidorków koktajlowych","5ml oliwy","sok z cytryny, sól, pieprz"],
+    wykonanie:"1. Ziemniaki ugotować do miękkości ~20 min.\n2. Kurczaka lekko rozbić, ułożyć ser i zawinąć (lub dodać ser na końcu). Doprawić.\n3. Posiekać cebulę, rozgrzać oliwę, podsmażyć z roladkami kurczaka.\n4. Jogurt wymieszać z odrobiną ciepłej wody, curry, solą i erytrolem.\n5. Gdy cebula się zeszkli a mięso mękkie — dodać sos. Mieszać do zgęstnienia. Doprawić.\n6. Pomidorki i szpinak umieścić w misce — sałatka.\n7. Podawać z ziemniakami i sałatką.",
+    uwaga:"Gotuj x2 — starcza na sobotę i niedzielę. Curry możesz pominąć lub zamienić na zioła prowansalskie.",
+  },
+  "Owsiany deser orzechowy z borówkami": {
+    kcal:424, czas:"10 min", porcje:2, tagi:["IO","maluch","bulk"],
+    skladniki:["100g płatków owsianych górskich","40g masła orzechowego","150g skyru waniliowego","150g borówek","5g kakao 16%"],
+    wykonanie:"1. Płatki uprażyć na suchej patelni do zarumienienia, dodać masło orzechowe.\n2. Przygotować dwa naczynia — wyłożyć płatki z masłem na dno.\n3. Wstawić do lodówki na chwilę.\n4. Wymieszać skyr z kakao (można dodać erytrol lub ekstrakt waniliowy).\n5. Na płatki wyłożyć masę kakaową, na górę borówki. Schłodzić.",
+    uwaga:"Gotuj x2 — starcza na sobotę i niedzielę.",
+  },
+  "Razowa zapieksa z pieczarkami i serem": {
+    kcal:453, czas:"10 min", porcje:1, tagi:["szybkie","IO","maluch"],
+    skladniki:["1 bułka pełnoziarnista (65g)","100g pieczarek świeżych","45g sera żółtego","5ml oliwy","20g keczupu","100g pomidorków koktajlowych"],
+    wykonanie:"Pieczarki pokroić w kostkę. Rozgrzać oliwę, podsmażyć grzyby. Przekroić bułkę, wyłożyć podsmażone pieczarki, na górę plastry sera żółtego. Piec do rozpuszczenia sera. Polać keczupem, podać z pomidorkami.",
+  },
 };
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -577,48 +801,55 @@ function PrzepisModal({ nazwa, onClose }) {
 // ══════════════════════════════════════════════════════════════════════════
 
 const PLANER_DAYS = ['Poniedziałek','Wtorek','Środa','Czwartek','Piątek','Sobota','Niedziela'];
-const PLANER_MEALS = ['Śniadanie','Obiad','Kolacja'];
+const PLANER_MEALS = ['Śniadanie','2. Śniadanie','Obiad','Kolacja'];
 
 const PLANER_DEFAULT = {
   'Poniedziałek': { type:'cook', meals:{
     'Śniadanie':{ name:'Szejk żelazowa moc', sub:'Banan, WPI, mleko migdałowe, masło orzechowe, chia', tag:'baby' },
+    '2. Śniadanie': { name:'Szejk żelazowa moc', sub:'Banan, WPI, mleko migdałowe, masło orzechowe, chia', tag:'baby' },
     'Obiad':    { name:'Kurczak teriyaki z ryżem', sub:'Pierś kurczaka, ryż basmati, papryka, cukinia — gotuj x2', tag:'cook' },
     'Kolacja':  { name:'Tortilla z serkiem i warzywami', sub:'Tortilla pełnoz., ricotta, ogórek, pomidor, roszponka — gotuj x3', tag:'cook' }
   }},
   'Wtorek': { type:'easy', meals:{
     'Śniadanie':{ name:'Szejk zdrowe jelita', sub:'Banan, borówki, maliny, WPI, siemię lniane', tag:'baby' },
+    '2. Śniadanie': { name:'Szejk zdrowe jelita', sub:'Banan, borówki, maliny, WPI, siemię lniane', tag:'baby' },
     'Obiad':    { name:'Kurczak teriyaki z ryżem', sub:'Podgrzewasz z poniedziałku', tag:'' },
     'Kolacja':  { name:'Tortilla z serkiem', sub:'Z poniedziałkowych zapasów', tag:'' }
   }},
   'Środa': { type:'cook2', meals:{
     'Śniadanie':{ name:'Tosty z mozzarellą', sub:'Chleb tostowy, mozzarella light, szpinak, pomidor', tag:'baby' },
+    '2. Śniadanie': { name:'Szejk proteinowy', sub:'Maliny, płatki owsiane, siemię lniane, WPI', tag:'baby' },
     'Obiad':    { name:'Kurczak teriyaki z ryżem', sub:'Podgrzewasz z poniedziałku', tag:'' },
     'Kolacja':  { name:'Jajecznica w tortilli', sub:'Jajka, tortilla, suszone pomidory, rukola — gotuj x3', tag:'cook' }
   }},
   'Czwartek': { type:'cook2', meals:{
     'Śniadanie':{ name:'Szejk proteinowy', sub:'Maliny, płatki owsiane, siemię lniane, WPI', tag:'baby' },
+    '2. Śniadanie': { name:'Szejk śniadaniowy', sub:'2 banany, masło orzechowo-czekoladowe, WPI', tag:'baby' },
     'Obiad':    { name:'Makaron z kurczakiem i brokułem', sub:'Makaron razowy, kurczak, brokuł, parmezan — gotuj x2', tag:'cook' },
     'Kolacja':  { name:'Jajecznica w tortilli', sub:'Z środowych zapasów', tag:'' }
   }},
   'Piątek': { type:'easy', meals:{
     'Śniadanie':{ name:'Szejk śniadaniowy', sub:'2 banany, masło orzechowo-czekoladowe, WPI', tag:'baby' },
+    '2. Śniadanie': { name:'Szejk żelazowa moc', sub:'Banan, WPI, mleko migdałowe, masło orzechowe, chia', tag:'baby' },
     'Obiad':    { name:'Makaron z kurczakiem i brokułem', sub:'Podgrzewasz z czwartku', tag:'' },
     'Kolacja':  { name:'Jajecznica w tortilli', sub:'Z środowych zapasów', tag:'' }
   }},
   'Sobota': { type:'easy', meals:{
     'Śniadanie':{ name:'Tosty z jajkiem i szynką', sub:'Chleb żytni, jajko sadzone, szynka, pomidor, sałata', tag:'baby' },
+    '2. Śniadanie': { name:'Szejk zdrowe jelita', sub:'Banan, borówki, maliny, WPI, siemię lniane', tag:'baby' },
     'Obiad':    { name:'Makaron z kurczakiem i brokułem', sub:'Podgrzewasz z czwartku', tag:'' },
     'Kolacja':  { name:'Fit smoothie z szpinakiem', sub:'Banan, jabłko, szpinak, WPI, mleko migdałowe', tag:'baby' }
   }},
   'Niedziela': { type:'free', meals:{
-    'Śniadanie':{ name:'Wolny wybór', sub:'', tag:'' },
-    'Obiad':    { name:'Wolny wybór', sub:'', tag:'' },
-    'Kolacja':  { name:'Wolny wybór', sub:'', tag:'' }
+    'Śniadanie':    { name:'Wolny wybór', sub:'', tag:'' },
+    '2. Śniadanie': { name:'Shake wg uznania', sub:'Dowolny shake z bazy', tag:'baby' },
+    'Obiad':        { name:'Wolny wybór', sub:'', tag:'' },
+    'Kolacja':      { name:'Wolny wybór', sub:'', tag:'' }
   }},
 };
 
 const PLANER_SHOP_DEFAULT = [
-  { cat:'🥩 Białko i mięso', items:[{n:'Pierś kurczaka',a:'600g'},{n:'Jajka',a:'10 szt.'},{n:'Szynka kanapkowa',a:'1 op.'},{n:'WPI (izolat białka)',a:'250g'}]},
+  { cat:'🥩 Białko i mięso', items:[{n:'Pierś kurczaka',a:'600g'},{n:'Jajka',a:'10 szt.'},{n:'Szynka kanapkowa',a:'1 op.'},{n:'WPI (izolat białka)',a:'400g — na szejki x2 dziennie'}]},
   { cat:'🧀 Nabiał', items:[{n:'Mozzarella light',a:'1 op. (80g)'},{n:'Ricotta',a:'70g'},{n:'Jogurt naturalny 0%',a:'1 op.'},{n:'Parmezan',a:'mały kawałek'}]},
   { cat:'🥦 Warzywa', items:[{n:'Szpinak',a:'2 garście'},{n:'Brokuł',a:'1 szt.'},{n:'Papryka czerwona',a:'2 szt.'},{n:'Cukinia',a:'1 szt.'},{n:'Pomidor',a:'4 szt.'},{n:'Ogórek',a:'2 szt.'},{n:'Roszponka',a:'1 op.'},{n:'Rukola',a:'mała op.'},{n:'Sałata',a:'1 op.'}]},
   { cat:'🍓 Owoce', items:[{n:'Banany',a:'8–9 szt.'},{n:'Maliny (mogą być mrożone)',a:'300g'},{n:'Borówki',a:'100g'},{n:'Jabłko',a:'1 szt.'}]},
@@ -652,7 +883,7 @@ function planerWeekDates(offset) {
 // ══════════════════════════════════════════════════════════════════════════
 
 function ZamienModal({ day, mealType, currentName, onSelect, onClose }) {
-  const [filter, setFilter] = React.useState('wszystkie');
+  const [filter, setFilter] = React.useState(mealType === '2. Śniadanie' ? 'szejk' : 'wszystkie');
   const [search, setSearch] = React.useState('');
 
   const kategorie = ['wszystkie', 'szejk', 'szybkie', 'kurczak', 'ryba', 'makaron', 'jajka', 'IO', 'maluch', 'bulk'];
@@ -803,7 +1034,7 @@ function PlanerTygodniowy() {
     dayHead:{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'10px 13px', cursor:'pointer' },
     dayName:{ fontSize:13, fontWeight:600, color:MAY.forest },
     badge:(type)=>{ const cfg={cook:{bg:'#EBF2EB',c:'#3B6D3A',t:'Dzień gotowania'},cook2:{bg:MAY.sun,c:MAY.forest,t:'Gotowanie wieczór'},easy:{bg:MAY.baby,c:MAY.forest,t:'Składanie'},free:{bg:MAY.blush,c:MAY.forest,t:'Dzień wolny'}}; const x=cfg[type]||cfg.easy; return {fontSize:9,padding:'2px 7px',borderRadius:20,background:x.bg,color:x.c,label:x.t}; },
-    mealsGrid:{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:8, padding:'10px 13px', borderTop:`1px solid ${MAY.baby}` },
+    mealsGrid:{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8, padding:'10px 13px', borderTop:`1px solid ${MAY.baby}` },
     mealType:{ fontSize:9, textTransform:'uppercase', letterSpacing:'0.07em', color:MAY.forest, opacity:.4, marginBottom:3 },
     mealBox:{ background:MAY.bg, border:`1px solid ${MAY.sea}`, borderRadius:8, padding:'7px 9px', minHeight:54, position:'relative' },
     mealName:{ fontSize:11, fontWeight:600, color:MAY.forest, lineHeight:1.4 },
